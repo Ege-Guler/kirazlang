@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "daohong-emilio.yash",
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "twxs.cmake",
+        "xaver.clang-format"
+    ]
+}
