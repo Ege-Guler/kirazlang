@@ -47,6 +47,7 @@ stmt:
     | addsub
     | muldiv
     | posneg
+    | identifier
     | letstmt
     ;
 
