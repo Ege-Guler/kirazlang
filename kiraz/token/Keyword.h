@@ -9,35 +9,41 @@ class Keyword : public Token {
 public:
     Keyword(int type) : Token(type) {}
 };
-class KwImport : public Keyword {
-public:
-    KwImport() : Keyword(KW_IMPORT) {}
-    std::string as_string() const override { return "KW_IMPORT"; }
-};
 
-class KwFunc : public Keyword {
+class KwLet : public Keyword {
 public:
-    KwFunc() : Keyword(KW_FUNC) {}
-    std::string as_string() const override { return "KW_FUNC"; }
+    KwLet() : Keyword(KW_LET) {}
+    std::string as_string() const override { return "KW_LET"; }
 };
+    // class KwImport : public Keyword {
+    // public:
+    //     KwImport() : Keyword(KW_IMPORT) {}
+    //     std::string as_string() const override { return "KW_IMPORT"; }
+    // };
 
-class KwIf : public Keyword {
-public:
-    KwIf() : Keyword(KW_IF) {}
-    std::string as_string() const override { return "KW_IF"; }
-};
+    // class KwFunc : public Keyword {
+    // public:
+    //     KwFunc() : Keyword(KW_FUNC) {}
+    //     std::string as_string() const override { return "KW_FUNC"; }
+    // };
 
-class KwWhile : public Keyword {
-public:
-    KwWhile() : Keyword(KW_WHILE) {}
-    std::string as_string() const override { return "KW_WHILE"; }
-};
+    // class KwIf : public Keyword {
+    // public:
+    //     KwIf() : Keyword(KW_IF) {}
+    //     std::string as_string() const override { return "KW_IF"; }
+    // };
 
-class KwClass : public Keyword {
-public:
-    KwClass() : Keyword(KW_CLASS) {}
-    std::string as_string() const override { return "KW_CLASS"; }
-};
+    // class KwWhile : public Keyword {
+    // public:
+    //     KwWhile() : Keyword(KW_WHILE) {}
+    //     std::string as_string() const override { return "KW_WHILE"; }
+    // };
+
+    // class KwClass : public Keyword {
+    // public:
+    //     KwClass() : Keyword(KW_CLASS) {}
+    //     std::string as_string() const override { return "KW_CLASS"; }
+    // };
 
 } // namespace token
 

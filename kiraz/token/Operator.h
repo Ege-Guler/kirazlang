@@ -46,6 +46,23 @@ public:
     std::string as_string() const override { return "OP_RPAREN"; }
 };
 
+class OpAssign : public Operator {
+public:
+    OpAssign() : Operator(OP_ASSIGN){}
+    std::string as_string() const override {return "OP_ASSIGN"; }
+};
+
+class OpColon: public Operator {
+public:
+    OpColon() : Operator(OP_COLON){}
+    std::string as_string() const override {return "OP_COLON"; }
+};
+
+class OpSemiColon: public Operator {
+public:
+    OpSemiColon() : Operator(OP_COLON){}
+    std::string as_string() const override {return "OP_SEMICOLON"; }
+};
 }
 
 #endif  // KIRAZ_TOKEN_OPERATOR_H
