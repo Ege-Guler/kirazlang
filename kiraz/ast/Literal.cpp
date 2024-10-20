@@ -12,6 +12,7 @@ Integer::Integer(Token::Ptr t) : Node(L_INTEGER) {
 
     try {
         m_value = std::stoll(token_int->get_value(), nullptr, base);
+        m_base = base;
     }
     catch (const std::exception &e) {
         // TODO Mark this node as invalid

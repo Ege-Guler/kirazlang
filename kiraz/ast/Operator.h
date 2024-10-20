@@ -25,22 +25,22 @@ class OpBinary : public Node {
             std::string opstr;
                 switch(get_id()) {
                     case OP_PLUS:
-                        opstr = "Add";
+                        opstr = "OP_PLUS";
                         break;
                     case OP_MINUS:
-                        opstr = "Sub";
+                        opstr = "OP_MINUS";
                         break;
                     case OP_MULT:
-                        opstr = "Mult";
+                        opstr = "OP_MULT";
                         break;
                     case OP_DIVF:
-                        opstr = "Div";
+                        opstr = "OP_DIV";
                         break;
                     default:
                         break;
                 }
 
-                return fmt::format("{}({},{})", opstr, get_left()->as_string(), get_right()->as_string());
+                return fmt::format("{}(l={}, r={})", opstr, get_left()->as_string(), get_right()->as_string());
         }
 
 private:
