@@ -15,17 +15,18 @@ public:
     KwLet() : Keyword(KW_LET) {}
     std::string as_string() const override { return "KW_LET"; }
 };
+class KwFunc : public Keyword {
+public:
+    KwFunc() : Keyword(KW_FUNC) {}
+    std::string as_string() const override { return "KW_FUNC"; }
+};
     // class KwImport : public Keyword {
     // public:
     //     KwImport() : Keyword(KW_IMPORT) {}
     //     std::string as_string() const override { return "KW_IMPORT"; }
     // };
 
-    // class KwFunc : public Keyword {
-    // public:
-    //     KwFunc() : Keyword(KW_FUNC) {}
-    //     std::string as_string() const override { return "KW_FUNC"; }
-    // };
+
 
     // class KwIf : public Keyword {
     // public:
