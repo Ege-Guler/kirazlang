@@ -108,9 +108,13 @@ funcstmt:
     ;
 
 arglist:
-    identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3); }
-    | identifier OP_COLON identifier               { $$ = Node::add<ast::ArgList>($1); }
-    | %empty               { $$ = nullptr; }
+    identifier OP_COLON identifier OP_COMMA arglist { 
+        $$ = Node::add<ast::ArgList>($1, $3, $5); 
+    }
+    | identifier OP_COLON identifier { 
+        $$ = Node::add<ast::ArgList>($1, $3, nullptr); 
+    }
+    | %empty { $$ = nullptr; }
     ;
 
 
