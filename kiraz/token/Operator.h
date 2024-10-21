@@ -46,23 +46,41 @@ public:
     std::string as_string() const override { return "OP_RPAREN"; }
 };
 
+class OpLbrace : public Operator {
+public:
+    OpLbrace() : Operator(OP_LBRACE) {}
+    std::string as_string() const override { return "OP_LBRACE"; }
+};
+
+class OpRbrace : public Operator {
+public:
+    OpRbrace() : Operator(OP_RBRACE) {}
+    std::string as_string() const override { return "OP_RBRACE"; }
+};
 class OpAssign : public Operator {
 public:
-    OpAssign() : Operator(OP_ASSIGN){}
-    std::string as_string() const override {return "OP_ASSIGN"; }
+    OpAssign() : Operator(OP_ASSIGN) {}
+    std::string as_string() const override { return "OP_ASSIGN"; }
 };
 
-class OpColon: public Operator {
+class OpColon : public Operator {
 public:
-    OpColon() : Operator(OP_COLON){}
-    std::string as_string() const override {return "OP_COLON"; }
+    OpColon() : Operator(OP_COLON) {}
+    std::string as_string() const override { return "OP_COLON"; }
 };
 
-class OpSemiColon: public Operator {
+class OpSemiColon : public Operator {
 public:
-    OpSemiColon() : Operator(OP_COLON){}
-    std::string as_string() const override {return "OP_SEMICOLON"; }
+    OpSemiColon() : Operator(OP_SEMICOLON) {}
+    std::string as_string() const override { return "OP_SEMICOLON"; }
 };
+
+class OpComma : public Operator {
+public:
+    OpComma() : Operator(OP_COMMA) {}
+    std::string as_string() const override { return "OP_COMMA"; }
+};
+
 }
 
-#endif  // KIRAZ_TOKEN_OPERATOR_H
+#endif // KIRAZ_TOKEN_OPERATOR_H

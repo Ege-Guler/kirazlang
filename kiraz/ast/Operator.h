@@ -36,6 +36,9 @@ class OpBinary : public Node {
                     case OP_DIVF:
                         opstr = "OP_DIV";
                         break;
+                    case OP_ASSIGN:
+                        opstr = "OP_ASSIGN";
+                        break;
                     default:
                         break;
                 }
@@ -65,6 +68,11 @@ public:
 class OpDivF : public OpBinary {
 public:
     OpDivF(const Node::Ptr &left, const Node::Ptr & right) : OpBinary(OP_DIVF, left, right) {}
+};
+
+class OpAssign : public OpBinary {
+public: 
+    OpAssign(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_ASSIGN, left, right) {}
 };
 }
 
