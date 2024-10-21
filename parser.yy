@@ -46,6 +46,15 @@ extern int yylineno;
 
 %%
 
+program:
+    stmtlist 
+    ;
+
+stmtlist:
+    stmt OP_SEMICOLON stmtlist { $$ = Node::add<ast::NodeList>($1, $3); }  
+    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }    
+    ;
+
 stmt:
     OP_LPAREN stmt OP_RPAREN { $$ = $2; }
     | addsub
@@ -59,6 +68,7 @@ stmt:
 
 assignmentstmt:
     identifier OP_ASSIGN literal OP_SEMICOLON {$$ = Node::add<ast::OpAssign>($1, $3); }
+
 
 addsub:
     stmt OP_PLUS stmt { $$ = Node::add<ast::OpAdd>($1, $3); }
@@ -77,37 +87,31 @@ posneg:
     ;
 
 letstmt:
-    KW_LET identifier OP_ASSIGN literal OP_SEMICOLON {
+    KW_LET identifier OP_ASSIGN literal  {
         $$ = Node::add<ast::KwLet>($2, nullptr, $4);
     }
-    | KW_LET identifier OP_COLON identifier OP_SEMICOLON {
+    | KW_LET identifier OP_COLON identifier  {
         $$ = Node::add<ast::KwLet>($2, $4, nullptr);
     }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt OP_SEMICOLON {
+    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {
         $$ = Node::add<ast::KwLet>($2, $4, $6);
     }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN literal OP_SEMICOLON {
+    | KW_LET identifier OP_COLON identifier OP_ASSIGN literal  {
         $$ = Node::add<ast::KwLet>($2, $4, $6);
     }
     ;
+
+
 
 funcstmt:
-    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier funcscope {
-        $$ = Node::add<ast::KwFunc>($2, $4, $7, $8);
-    }
-    ;
-
-funcscope:
-    OP_LBRACE stmtlist OP_RBRACE {
-        $$ = Node::add<ast::NodeList>($2);
+    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmtlist OP_RBRACE {
+        $$ = Node::add<ast::KwFunc>($2, $4, $7, $9);
     }
     ;
 
 
-stmtlist:
-    stmt OP_SEMICOLON stmtlist { $$ = Node::add<ast::NodeList>($1, $3); }
-    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }
-    ;
+
+
 
 arglist:
     identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3); }
