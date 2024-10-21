@@ -51,7 +51,8 @@ program:
 
 stmtlist:
     stmt OP_SEMICOLON stmtlist { $$ = Node::add<ast::NodeList>($1, $3); }  
-    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }    
+    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }
+    | funcstmt    
     ;
 
 stmt:
