@@ -46,8 +46,8 @@ public:
         } else {
             result += ", args=[]";
         }
-        result += fmt::format(", rtype={}", m_rtype->as_string());
-        result += fmt::format(", scope={}", m_scope->as_string());
+        result += fmt::format(", r={}", m_rtype->as_string());
+        result += fmt::format(", s={}", m_scope->as_string());
 
         return result;
     }

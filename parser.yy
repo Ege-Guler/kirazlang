@@ -46,7 +46,7 @@ extern int yylineno;
 
 %%
 
-program:
+code:
     stmtlist 
     ;
 
@@ -68,7 +68,7 @@ stmt:
     ;
 
 assignmentstmt:
-    identifier OP_ASSIGN literal OP_SEMICOLON {$$ = Node::add<ast::OpAssign>($1, $3); }
+    identifier OP_ASSIGN literal {$$ = Node::add<ast::OpAssign>($1, $3); }
 
 
 addsub:
@@ -102,22 +102,16 @@ letstmt:
     }
     ;
 
-
-
 funcstmt:
     KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmtlist OP_RBRACE {
         $$ = Node::add<ast::KwFunc>($2, $4, $7, $9);
     }
     ;
 
-
-
-
-
 arglist:
-    identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3); }
-    | identifier                { $$ = Node::add<ast::ArgList>($1); }
-    | /* empty */               { $$ = nullptr; }
+    identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3); }
+    | identifier OP_COLON identifier               { $$ = Node::add<ast::ArgList>($1); }
+    | %empty               { $$ = nullptr; }
     ;
 
 
