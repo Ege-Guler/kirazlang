@@ -8,6 +8,8 @@
 
 #include <kiraz/token/Literal.h>
 
+#include <vector>
+
 int yyerror(const char *msg);
 extern std::shared_ptr<Token> curtoken;
 extern int yylineno;
@@ -17,9 +19,10 @@ extern int yylineno;
 
 %token REJECTED
 
-
 %token OP_LPAREN
 %token OP_RPAREN
+%token OP_LBRACE
+%token OP_RBRACE
 
 %token OP_PLUS
 %token OP_MINUS
@@ -27,9 +30,12 @@ extern int yylineno;
 %token OP_DIVF
 
 %token KW_LET
+%token KW_FUNC
+
 %token OP_ASSIGN
 %token OP_COLON
 %token OP_SEMICOLON
+%token OP_COMMA
 
 %token IDENTIFIER
 
@@ -38,9 +44,17 @@ extern int yylineno;
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
 
-
-
 %%
+
+code:
+    stmtlist 
+    ;
+
+stmtlist:
+    stmt OP_SEMICOLON stmtlist { $$ = Node::add<ast::NodeList>($1, $3); }  
+    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }
+    | funcstmt    
+    ;
 
 stmt:
     OP_LPAREN stmt OP_RPAREN { $$ = $2; }
@@ -49,15 +63,21 @@ stmt:
     | posneg
     | identifier
     | letstmt
+    | funcstmt
+    | assignmentstmt
     ;
 
+assignmentstmt:
+    identifier OP_ASSIGN literal {$$ = Node::add<ast::OpAssign>($1, $3); }
+
+
 addsub:
-     stmt OP_PLUS stmt { $$ = Node::add<ast::OpAdd>($1, $3); }
+    stmt OP_PLUS stmt { $$ = Node::add<ast::OpAdd>($1, $3); }
     | stmt OP_MINUS stmt { $$ = Node::add<ast::OpSub>($1, $3); }
     ;
 
 muldiv:
-     stmt OP_MULT stmt { $$ = Node::add<ast::OpMult>($1, $3); }
+    stmt OP_MULT stmt { $$ = Node::add<ast::OpMult>($1, $3); }
     | stmt OP_DIVF stmt { $$ = Node::add<ast::OpDivF>($1, $3); }
     ;
 
@@ -68,19 +88,36 @@ posneg:
     ;
 
 letstmt:
-    KW_LET identifier OP_ASSIGN literal OP_SEMICOLON { 
-        $$ = Node::add<ast::KwLet>($2, nullptr, $4); 
+    KW_LET identifier OP_ASSIGN literal  {
+        $$ = Node::add<ast::KwLet>($2, nullptr, $4);
     }
-    | KW_LET identifier OP_COLON identifier OP_SEMICOLON { 
-        $$ = Node::add<ast::KwLet>($2, $4, nullptr); 
+    | KW_LET identifier OP_COLON identifier  {
+        $$ = Node::add<ast::KwLet>($2, $4, nullptr);
     }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt OP_SEMICOLON { 
-        $$ = Node::add<ast::KwLet>($2, $4, $6); 
+    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {
+        $$ = Node::add<ast::KwLet>($2, $4, $6);
     }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN literal OP_SEMICOLON { 
-        $$ = Node::add<ast::KwLet>($2, $4, $6); 
+    | KW_LET identifier OP_COLON identifier OP_ASSIGN literal  {
+        $$ = Node::add<ast::KwLet>($2, $4, $6);
     }
     ;
+
+funcstmt:
+    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmtlist OP_RBRACE {
+        $$ = Node::add<ast::KwFunc>($2, $4, $7, $9);
+    }
+    ;
+
+arglist:
+    identifier OP_COLON identifier OP_COMMA arglist { 
+        $$ = Node::add<ast::ArgList>($1, $3, $5); 
+    }
+    | identifier OP_COLON identifier { 
+        $$ = Node::add<ast::ArgList>($1, $3, nullptr); 
+    }
+    | %empty { $$ = nullptr; }
+    ;
+
 
 literal:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
@@ -90,15 +127,13 @@ identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken); }
     ;
 
-
 %%
 
 int yyerror(const char *s) {
     if (curtoken) {
         fmt::print("** Parser Error at {}:{} at token: {}\n",
             yylineno, Token::colno, curtoken->as_string());
-    }
-    else {
+    } else {
         fmt::print("** Parser Error at {}:{}, null token\n",
             yylineno, Token::colno);
     }
