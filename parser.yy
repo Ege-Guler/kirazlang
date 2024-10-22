@@ -47,63 +47,55 @@ extern int yylineno;
 %%
 
 code:
-    stmtlist 
+    stmt_or_func_list
     ;
 
-stmtlist:
-    stmt OP_SEMICOLON stmtlist { $$ = Node::add<ast::NodeList>($1, $3); }  
-    | stmt OP_SEMICOLON          { $$ = Node::add<ast::NodeList>($1); }
-    | funcstmt    
+stmt_or_func_list:
+    stmt OP_SEMICOLON stmt_or_func_list { $$ = Node::add<ast::NodeList>($1, $3); }  
+    | stmt OP_SEMICOLON                 { $$ = Node::add<ast::NodeList>($1); }
+    | funcstmt stmt_or_func_list         { $$ = Node::add<ast::NodeList>($1, $2); }
+    | funcstmt                          { $$ = Node::add<ast::NodeList>($1); }
     ;
 
 stmt:
     OP_LPAREN stmt OP_RPAREN { $$ = $2; }
-    | addsub
-    | muldiv
-    | posneg
-    | identifier
+    | expr
     | letstmt
-    | funcstmt
     | assignmentstmt
     ;
 
 assignmentstmt:
-    identifier OP_ASSIGN literal {$$ = Node::add<ast::OpAssign>($1, $3); }
-
-
-addsub:
-    stmt OP_PLUS stmt { $$ = Node::add<ast::OpAdd>($1, $3); }
-    | stmt OP_MINUS stmt { $$ = Node::add<ast::OpSub>($1, $3); }
+    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3); }
     ;
 
-muldiv:
-    stmt OP_MULT stmt { $$ = Node::add<ast::OpMult>($1, $3); }
-    | stmt OP_DIVF stmt { $$ = Node::add<ast::OpDivF>($1, $3); }
+expr:
+    expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
+    | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
+    | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
+    | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
+    | posneg
     ;
 
 posneg:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
-    | OP_PLUS stmt { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
-    | OP_MINUS stmt { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
+    | OP_PLUS expr { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
+    | OP_MINUS expr { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
     ;
 
 letstmt:
-    KW_LET identifier OP_ASSIGN literal  {
-        $$ = Node::add<ast::KwLet>($2, nullptr, $4);
+    KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {
+        $$ = Node::add<ast::KwLet>($2, $4, $6);
     }
     | KW_LET identifier OP_COLON identifier  {
         $$ = Node::add<ast::KwLet>($2, $4, nullptr);
     }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {
-        $$ = Node::add<ast::KwLet>($2, $4, $6);
-    }
-    | KW_LET identifier OP_COLON identifier OP_ASSIGN literal  {
-        $$ = Node::add<ast::KwLet>($2, $4, $6);
+    | KW_LET identifier OP_ASSIGN stmt  {
+        $$ = Node::add<ast::KwLet>($2, nullptr, $4);
     }
     ;
 
 funcstmt:
-    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmtlist OP_RBRACE {
+    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmt_or_func_list OP_RBRACE {
         $$ = Node::add<ast::KwFunc>($2, $4, $7, $9);
     }
     ;
@@ -117,7 +109,6 @@ arglist:
     }
     | %empty { $$ = nullptr; }
     ;
-
 
 literal:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
