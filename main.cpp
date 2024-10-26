@@ -8,6 +8,10 @@
 
 #include <kiraz/Node.h>
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 extern int yydebug;
 
 enum Status {
@@ -21,6 +25,13 @@ enum Mode {
     MODE_TEXT,
     MODE_HELP,
 };
+
+inline static bool ends_with(const std::string &value, const std::string &ending) {
+    if (ending.size() > value.size()) {
+        return false;
+    }
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
 
 static int test(std::string_view str) {
     auto buffer = yy_scan_string(str.data());
@@ -51,7 +62,28 @@ static int handle_mode_text(std::string_view arg) {
 }
 
 static int handle_mode_file(std::string_view arg) {
-    fmt::print("TODO\n");
+
+    std::string file_path = std::string(arg).c_str();
+    if (ends_with(file_path, "ki")) {
+
+        std::ifstream f;
+        f.open(file_path);
+
+        if (f.is_open()) {
+            std::string file_content((std::istreambuf_iterator<char>(f)),
+            std::istreambuf_iterator<char>());
+
+            f.close();
+            if (auto ret = test(file_content); ret != OK) {
+                return ret;
+            }
+            else {
+                return ERR;
+            }
+        }else{
+            std::cerr << "Failed to open file: " << file_path << std::endl;
+        }
+    }  
     return ERR;
 }
 
@@ -69,7 +101,7 @@ int main(int argc, char **argv) {
 
         std::string_view arg(argv[i]);
 
-        if (mode == MODE_UNKNOWN){
+        if (mode == MODE_UNKNOWN) {
             if (arg == "-f") {
                 mode = MODE_FILE;
                 continue;
@@ -92,7 +124,7 @@ int main(int argc, char **argv) {
             return usage(argc, argv);
 
         case MODE_FILE:
-            if (auto ret = handle_mode_file(argv[i])    ; ret != OK) {
+            if (auto ret = handle_mode_file(argv[i]); ret != OK) {
                 return ret;
             }
             return 1;
