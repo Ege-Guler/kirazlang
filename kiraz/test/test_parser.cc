@@ -65,55 +65,55 @@ TEST_F(ParserFixture, invalid_char) {
 }
 
 TEST_F(ParserFixture, plus) {
-    verify_single("1+2", "Add(Integer(1),Integer(2))");
+    verify_single("1+2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_s) {
-    verify_single("1+2 ", "Add(Integer(1),Integer(2))");
+    verify_single("1+2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_sb) {
-    verify_single("1 +2", "Add(Integer(1),Integer(2))");
+    verify_single("1 +2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_ss) {
-    verify_single("1 + 2", "Add(Integer(1),Integer(2))");
+    verify_single("1 + 2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_sa) {
-    verify_single("1+ 2", "Add(Integer(1),Integer(2))");
+    verify_single("1+ 2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_n) {
-    verify_single("1+\n2", "Add(Integer(1),Integer(2))");
+    verify_single("1+\n2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, plus_t) {
-    verify_single("1+\t2", "Add(Integer(1),Integer(2))");
+    verify_single("1+\t2;", "Add(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, minus) {
-    verify_single("1-2", "Sub(Integer(1),Integer(2))");
+    verify_single("1-2;", "Sub(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, mult) {
-    verify_single("1*2", "Mult(Integer(1),Integer(2))");
+    verify_single("1*2;", "Mult(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, divf) {
-    verify_single("1/2", "DivF(Integer(1),Integer(2))");
+    verify_single("1/2;", "DivF(Integer(1),Integer(2))");
 }
 
 TEST_F(ParserFixture, muladd) {
-    verify_single("1+2*3", "Add(Integer(1),Mult(Integer(2),Integer(3)))");
+    verify_single("1+2*3;", "Add(Integer(1),Mult(Integer(2),Integer(3)))");
 }
 
 TEST_F(ParserFixture, muladd_paren) {
-    verify_single("1+(2*3)", "Add(Integer(1),Mult(Integer(2),Integer(3)))");
+    verify_single("1+(2*3);", "Add(Integer(1),Mult(Integer(2),Integer(3)))");
 }
 
 TEST_F(ParserFixture, addmul_paren) {
-    verify_single("(1+2)*3", "Mult(Add(Integer(1),Integer(2)),Integer(3))");
+    verify_single("(1+2)*3;", "Mult(Add(Integer(1),Integer(2)),Integer(3))");
 }
 
 TEST_F(ParserFixture, string) {
