@@ -64,8 +64,8 @@ endif()
 
 flex_target(LEXER
     ${CMAKE_CURRENT_SOURCE_DIR}/lexer.l
-    ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp
-    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/lexer.h
+    ${CMAKE_CURRENT_BINARY_DIR}/_lexer_gen.cpp
+    DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/_lexer_gen.hpp
     COMPILE_FLAGS ${ADDITIONAL_FLEX_FLAGS}
 )
 
@@ -115,11 +115,13 @@ add_library(kiraz STATIC
     kiraz/ast/Literal.h
     kiraz/ast/Literal.cpp
 
+    main.h
     ${BISON_PARSER_OUTPUTS}
     ${FLEX_LEXER_OUTPUTS}
+    lexer.hpp
 )
 
-add_executable(kirazc main.h main.cpp)
+add_executable(kirazc main.cpp)
 target_link_libraries(kirazc PRIVATE kiraz)
 
 add_definitions(-DYYDEBUG=1)

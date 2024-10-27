@@ -17,6 +17,6 @@ include(GoogleTest)
 # tests
 #
 
-add_executable(test_arithmetic kiraz/test/test_arithmetic.cc)
-target_link_libraries(test_arithmetic kiraz GTest::gtest_main ${FLEX_LIBRARIES})
-gtest_discover_tests(test_arithmetic)
+add_executable(test_parser kiraz/test/test_parser.cc)
+target_link_libraries(test_parser kiraz GTest::gtest_main ${FLEX_LIBRARIES})
+gtest_discover_tests(test_parser)
