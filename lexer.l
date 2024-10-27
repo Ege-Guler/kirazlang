@@ -33,6 +33,10 @@ extern std::shared_ptr<Token> curtoken;
 
 "let" { colno += yyleng; curtoken = Token::New<KwLet>(); return KW_LET; }
 "func" { colno += yyleng; curtoken = Token::New<KwFunc>(); return KW_FUNC; }
+"if"     { colno += yyleng; curtoken = Token::New<KwIf>(); return KW_IF; }
+"import" { colno += yyleng; curtoken = Token::New<KwImport>(); return KW_IMPORT; }
+"else" { colno += yyleng; curtoken = Token::New<KwElse>(); return KW_ELSE; }
+
 
 [a-zA-Z_][a-zA-Z0-9_]* { colno += yyleng; curtoken = Token::New<Identifier>(yytext); return IDENTIFIER; }
 
