@@ -218,14 +218,14 @@ TEST_F(ParserFixture, assignment_iden) {
 
 TEST_F(ParserFixture, assignment_iden_neg_2) {
     verify_single(
-            "a = -(b / 5);", "Assign(l=Id(a), r=Signed(OP_MINUS, OP_DIVF(l=Id(b), r=Int(10, 5))))");
+            "a = -(b / 5);", "Assign(l=Id(a), r=Signed(OP_MINUS, DivF(l=Id(b), r=Int(10, 5))))");
 }
 
 TEST_F(ParserFixture, assignment_iden_neg_3) {
     verify_single("a = -(b / 5) + 3;",
             "Assign("
             "l=Id(a), "
-            "r=Add(l=Signed(OP_MINUS, OP_DIVF(l=Id(b), r=Int(10, 5))), r=Int(10, 3))"
+            "r=Add(l=Signed(OP_MINUS, DivF(l=Id(b), r=Int(10, 5))), r=Int(10, 3))"
             ")");
 }
 
