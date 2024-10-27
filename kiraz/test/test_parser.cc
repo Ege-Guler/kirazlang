@@ -125,11 +125,11 @@ TEST_F(ParserFixture, string_with_newline) {
 }
 
 TEST_F(ParserFixture, add_signed) {
-    verify_single("1 + -2;", "OP_PLUS(l=Int(10, 1), r=Signed(OP_MINUS, Int(10, 2)))");
+    verify_single("1 + -2;", "Add(l=Int(10, 1), r=Signed(OP_MINUS, Int(10, 2)))");
 }
 
 TEST_F(ParserFixture, signed_add) {
-    verify_single("-1 + 2;", "OP_PLUS(l=Signed(OP_MINUS, Int(10, 1)), r=Int(10, 2))");
+    verify_single("-1 + 2;", "Add(l=Signed(OP_MINUS, Int(10, 1)), r=Int(10, 2))");
 }
 
 TEST_F(ParserFixture, add_mul) {
