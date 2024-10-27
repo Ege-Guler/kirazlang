@@ -182,11 +182,9 @@ TEST_F(ParserFixture, paren_add__mul) {
 
 TEST_F(ParserFixture, neg_paren_add__mul) {
     verify_single("-(1 + 2) * 3;",
-            "Signed(OP_MINUS, "
             "Mult("
-            "l=Add(l=Int(10, 1), r=Int(10, 2)), "
+            "l=Signed(OP_MINUS, Add(l=Int(10, 1), r=Int(10, 2))), "
             "r=Int(10, 3)"
-            ")"
             ")");
 }
 
