@@ -4,7 +4,6 @@
 #include <kiraz/ast/Operator.h>
 #include <kiraz/ast/Literal.h>
 #include <kiraz/ast/Keyword.h>
-
 #include <kiraz/token/Literal.h>
 
 #include <vector>
@@ -18,23 +17,14 @@ extern int yylineno;
 
 %token REJECTED
 
-%token OP_LPAREN
-%token OP_RPAREN
-%token OP_LBRACE
-%token OP_RBRACE
+%token OP_LPAREN OP_RPAREN
+%token OP_LBRACE OP_RBRACE
 
-%token OP_PLUS
-%token OP_MINUS
-%token OP_MULT
-%token OP_DIVF
+%token OP_PLUS OP_MINUS OP_MULT OP_DIVF
 
-%token KW_LET
-%token KW_FUNC
+%token KW_LET KW_FUNC
 
-%token OP_ASSIGN
-%token OP_COLON
-%token OP_SEMICOLON
-%token OP_COMMA
+%token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
 
 %token IDENTIFIER
 
@@ -50,21 +40,20 @@ code:
     ;
 
 stmt_or_func_list:
-    stmt OP_SEMICOLON stmt_or_func_list { $$ = Node::add<ast::NodeList>($1, $3); }  
+    stmt OP_SEMICOLON stmt_or_func_list { $$ = Node::add<ast::NodeList>($1, $3); }
     | stmt OP_SEMICOLON                 { $$ = Node::add<ast::NodeList>($1); }
     | funcstmt stmt_or_func_list         { $$ = Node::add<ast::NodeList>($1, $2); }
     | funcstmt                          { $$ = Node::add<ast::NodeList>($1); }
     ;
 
 stmt:
-    OP_LPAREN stmt OP_RPAREN { $$ = $2; }
-    | expr
+    expr
     | letstmt
     | assignmentstmt
     ;
 
 assignmentstmt:
-    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3); }
+    identifier OP_ASSIGN expr { $$ = Node::add<ast::OpAssign>($1, $3); }
     ;
 
 expr:
@@ -72,25 +61,24 @@ expr:
     | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
+    | primary
+    ;
+
+primary:
+    OP_LPAREN expr OP_RPAREN { $$ = $2; }
     | posneg
     ;
 
 posneg:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
-    | OP_PLUS expr { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
-    | OP_MINUS expr { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
+    | OP_PLUS primary { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
+    | OP_MINUS primary { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
     ;
 
 letstmt:
-    KW_LET identifier OP_COLON identifier OP_ASSIGN stmt  {
-        $$ = Node::add<ast::KwLet>($2, $4, $6);
-    }
-    | KW_LET identifier OP_COLON identifier  {
-        $$ = Node::add<ast::KwLet>($2, $4, nullptr);
-    }
-    | KW_LET identifier OP_ASSIGN stmt  {
-        $$ = Node::add<ast::KwLet>($2, nullptr, $4);
-    }
+    KW_LET identifier OP_COLON identifier OP_ASSIGN expr { $$ = Node::add<ast::KwLet>($2, $4, $6); }
+    | KW_LET identifier OP_COLON identifier { $$ = Node::add<ast::KwLet>($2, $4, nullptr); }
+    | KW_LET identifier OP_ASSIGN expr { $$ = Node::add<ast::KwLet>($2, nullptr, $4); }
     ;
 
 funcstmt:
@@ -100,12 +88,8 @@ funcstmt:
     ;
 
 arglist:
-    identifier OP_COLON identifier OP_COMMA arglist { 
-        $$ = Node::add<ast::ArgList>($1, $3, $5); 
-    }
-    | identifier OP_COLON identifier { 
-        $$ = Node::add<ast::ArgList>($1, $3, nullptr); 
-    }
+    identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3, $5); }
+    | identifier OP_COLON identifier { $$ = Node::add<ast::ArgList>($1, $3, nullptr); }
     | %empty { $$ = nullptr; }
     ;
 

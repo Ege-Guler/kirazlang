@@ -76,12 +76,13 @@ public:
     }
 
     std::string as_string() const override {
-        std::string result = "NodeList(";
+        //std::string result = "NodeList(";
+        std::string result;
         for (const auto &node : m_nodes) {
             result += node->as_string() + ", ";
         }
         result.erase(result.length() - 2, 2);
-        result += ")";
+        //result += ")";
         return result;
     }
 
