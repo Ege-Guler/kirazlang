@@ -63,6 +63,41 @@ private:
     Node::Ptr m_scope;
 };
 
+class KwImport : public Node {
+public:
+    explicit KwImport(const Node::Ptr &identifier) : Node(KW_IMPORT), m_identifier(identifier) {
+        assert(identifier);
+    }
+
+    std::string as_string() const override {
+        return fmt::format("Import({})", m_identifier->as_string());
+    }
+
+private:
+    Node::Ptr m_identifier;
+};
+
+class KwIf : public Node {
+public:
+    explicit KwIf(const Node::Ptr &condition, const Node::Ptr &then_block, const Node::Ptr &else_block)
+        : Node(KW_IF), m_condition(condition), m_then_block(then_block), m_else_block(else_block) {
+        assert(condition);
+    }
+
+    std::string as_string() const override {
+        return fmt::format("If(?={}, then=[{}], else=[{}])",
+                           m_condition->as_string(),
+                           m_then_block ? m_then_block->as_string() : "",
+                           m_else_block ? m_else_block->as_string() : "");
+    }
+
+private:
+    Node::Ptr m_condition;
+    Node::Ptr m_then_block;
+    Node::Ptr m_else_block;
+};
+
+
 class NodeList : public Node {
 public:
     explicit NodeList(const Node::Ptr &node) : Node(1) { m_nodes.push_back(node); }

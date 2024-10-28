@@ -22,7 +22,7 @@ extern int yylineno;
 
 %token OP_PLUS OP_MINUS OP_MULT OP_DIVF
 
-%token KW_LET KW_FUNC
+%token KW_LET KW_FUNC KW_IF KW_IMPORT KW_ELSE
 
 %token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
 
@@ -50,11 +50,35 @@ stmt:
     expr
     | letstmt
     | assignmentstmt
+    | importstmt
+    | ifstmt
+    | identifier
     ;
 
 assignmentstmt:
     identifier OP_ASSIGN expr { $$ = Node::add<ast::OpAssign>($1, $3); }
     ;
+    
+importstmt:
+    KW_IMPORT identifier { $$ = Node::add<ast::KwImport>($2); }
+    ;
+
+ifstmt:
+    KW_IF OP_LPAREN identifier OP_RPAREN OP_LBRACE option_then OP_RBRACE option_else { $$ = Node::add<ast::KwIf>($3, $6, $8); }
+    ;
+    
+option_then:
+    stmt_or_func_list
+    | %empty { $$ = nullptr; }
+    ;
+    
+option_else:
+    KW_ELSE ifstmt { $$ = $2; }
+    | KW_ELSE OP_LBRACE stmt_or_func_list OP_RBRACE { $$ = $3; }
+    | KW_ELSE OP_LBRACE OP_RBRACE { $$ = nullptr; }
+    | %empty { $$ = nullptr; }
+    ;
+    
 
 expr:
     expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
