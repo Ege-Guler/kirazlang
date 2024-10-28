@@ -20,4 +20,6 @@ questions.txt
 
 # kiraz files
 *.ki
+# mac artifacts
+.DS_Store
 
