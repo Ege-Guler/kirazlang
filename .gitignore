@@ -2,6 +2,7 @@
 /build-*
 *.user
 
+/.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
