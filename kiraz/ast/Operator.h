@@ -25,16 +25,16 @@ public:
         std::string opstr;
         switch (get_id()) {
         case OP_PLUS:
-            opstr = "Add";
+            opstr = "OP_PLUS";
             break;
         case OP_MINUS:
-            opstr = "Sub";
+            opstr = "OP_MINUS";
             break;
         case OP_MULT:
-            opstr = "Mult";
+            opstr = "OP_MULT";
             break;
         case OP_DIVF:
-            opstr = "DivF";
+            opstr = "OP_DIVF";
             break;
         case OP_ASSIGN:
             opstr = "Assign";

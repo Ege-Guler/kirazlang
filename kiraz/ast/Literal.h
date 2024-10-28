@@ -21,7 +21,7 @@ public:
 
     std::string as_string() const override {
 
-        return fmt::format("SignedNode({}, {})", m_operator == OP_MINUS ? "OP_MINUS" : "OP_PLUS",
+        return fmt::format("Signed({}, {})", m_operator == OP_MINUS ? "OP_MINUS" : "OP_PLUS",
                 m_operand->as_string());
     }
 
