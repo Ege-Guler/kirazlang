@@ -39,19 +39,24 @@ public:
             : Node(KW_FUNC), m_name(name), m_args(args), m_rtype(rtype), m_scope(scope) {
         assert(name);
         assert(rtype);
-        assert(scope);
     }
 
     std::string as_string() const override {
-        std::string result = fmt::format("Func(n={})", m_name->as_string());
+        std::string result = fmt::format("Func(n={}", m_name->as_string());
         if (m_args) {
-            result += fmt::format(", a=FuncArgs[{}]", m_args->as_string());
+            result += fmt::format(", a={}", m_args->as_string());
         }
         else {
-            result += ", args=[]";
+            result += ", a=[]";
         }
         result += fmt::format(", r={}", m_rtype->as_string());
-        result += fmt::format(", s={}", m_scope->as_string());
+
+        if(m_scope){
+            result += fmt::format(", s=[{}])", m_scope->as_string());
+
+        }else{
+            result += ", s=[])";
+        }
 
         return result;
     }
@@ -111,13 +116,11 @@ public:
     }
 
     std::string as_string() const override {
-        //std::string result = "NodeList(";
         std::string result;
         for (const auto &node : m_nodes) {
             result += node->as_string() + ", ";
         }
         result.erase(result.length() - 2, 2);
-        //result += ")";
         return result;
     }
 
@@ -139,14 +142,15 @@ public:
     }
 
     std::string as_string() const override {
-        std::string result;
+        std::string result = "FuncArgs(";
         for (const auto &arg : m_args) {
-            result += "Arg(n=";
+            result += "[FArg(n=";
             result +=
-                    std::get<0>(arg)->as_string() + ", t=" + std::get<1>(arg)->as_string() + "), ";
+                    std::get<0>(arg)->as_string() + ", t=" + std::get<1>(arg)->as_string() + ")], ";
         }
 
-        result.erase(result.length() - 3, 3);
+        result.erase(result.length() - 2, 2);
+        result += ")";
         return result;
     }
 

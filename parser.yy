@@ -36,14 +36,13 @@ extern int yylineno;
 %%
 
 code:
-    stmt_or_func_list
+    stmt_list
     ;
 
-stmt_or_func_list:
-    stmt OP_SEMICOLON stmt_or_func_list { $$ = Node::add<ast::NodeList>($1, $3); }
-    | stmt OP_SEMICOLON                 { $$ = Node::add<ast::NodeList>($1); }
-    | funcstmt stmt_or_func_list         { $$ = Node::add<ast::NodeList>($1, $2); }
-    | funcstmt                          { $$ = Node::add<ast::NodeList>($1); }
+
+stmt_list:
+    stmt OP_SEMICOLON stmt_list { $$ = Node::add<ast::NodeList>($1, $3); }
+    | stmt OP_SEMICOLON         { $$ = Node::add<ast::NodeList>($1); }
     ;
 
 stmt:
@@ -53,6 +52,7 @@ stmt:
     | importstmt
     | ifstmt
     | identifier
+    | funcstmt
     ;
 
 assignmentstmt:
@@ -68,13 +68,13 @@ ifstmt:
     ;
     
 option_then:
-    stmt_or_func_list
+    stmt_list
     | %empty { $$ = nullptr; }
     ;
     
 option_else:
     KW_ELSE ifstmt { $$ = $2; }
-    | KW_ELSE OP_LBRACE stmt_or_func_list OP_RBRACE { $$ = $3; }
+    | KW_ELSE OP_LBRACE stmt_list OP_RBRACE { $$ = $3; }
     | KW_ELSE OP_LBRACE OP_RBRACE { $$ = nullptr; }
     | %empty { $$ = nullptr; }
     ;
@@ -106,11 +106,14 @@ letstmt:
     ;
 
 funcstmt:
-    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmt_or_func_list OP_RBRACE {
+    KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE stmt_list OP_RBRACE {
         $$ = Node::add<ast::KwFunc>($2, $4, $7, $9);
     }
+    |     KW_FUNC identifier OP_LPAREN arglist OP_RPAREN OP_COLON identifier OP_LBRACE OP_RBRACE {
+        $$ = Node::add<ast::KwFunc>($2, $4, $7, nullptr);
+    }
     ;
-
+    
 arglist:
     identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3, $5); }
     | identifier OP_COLON identifier { $$ = Node::add<ast::ArgList>($1, $3, nullptr); }
