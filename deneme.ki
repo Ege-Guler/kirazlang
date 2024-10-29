@@ -1,0 +1,10 @@
+let a : Int64;
+let a = 2 * 3;
+func f(a1 : A1) : T { let v : A1 = 5; };
+import a;
+if (a) {} else {};
+if (a) {s;} else {};
+if (a) {s;} else {s;};
+if (a) {} else {s;};
+if (a) { } else { s1; if (b) { s2; } else { s3; }; s4; };
+if (a) { s1; } else if (b) { s2; } else { s3; };
