@@ -15,6 +15,16 @@ private:
     int64_t m_base;
 };
 
+class String : public Node {
+public:
+    String(Token::Ptr);
+
+    std::string as_string() const override { return fmt::format("Str({})", m_value); }
+
+private:
+    std::string m_value;
+};
+
 class SignedNode : public Node {
 public:
     SignedNode(int op, Node::Cptr operand) : Node(op), m_operator(op), m_operand(operand) {}

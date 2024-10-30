@@ -86,6 +86,7 @@ expr:
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
     | primary
+    | literal
     ;
 
 primary:
@@ -121,7 +122,8 @@ arglist:
     ;
 
 literal:
-    L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
+      L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
+    | L_STRING  { $$ = Node::add<ast::String>(curtoken); }
     ;
 
 identifier:
