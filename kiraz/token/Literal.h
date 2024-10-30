@@ -31,7 +31,7 @@ public:
     String(std::string_view value) : Token(L_STRING), m_value(value) {}
     virtual ~String();
 
-    std::string as_string() const override { return fmt::format("String{}", m_value); }
+    std::string as_string() const override { return fmt::format("Str{}", m_value); }
 
     void print() { fmt::print("{}\n", as_string()); }
 
