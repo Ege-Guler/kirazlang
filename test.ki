@@ -1,0 +1,52 @@
+let x : Int64;
+let y : Int64 = 5;
+let z = 3 + 4 * 2 - 1;
+
+func multiply(a : Int64, b : Int64) : Int64 {
+    let result : Int64 = 32;
+    result;
+};
+
+if (x) {
+    let msg : String = "Hello World!";
+} else if (y) {
+    if (z) {
+        let nested : String = "Nested If";
+    } else {
+        let alt : Int64 = 10 / 2;
+    };
+} else {
+    let fallback : String = "Hello";
+};
+
+func emptyFunc(a : Int64) : Void {
+};
+
+
+if (y) {
+    let conditionMet : Int64 = 1;
+} else {
+    let alt1 : Int64 = 20;
+    if (z) {
+        let subCondition : String = "Sub";
+    } else {
+        let subAlt : Int64 = 30;
+    };
+    let endCondition : Int64 = 40;
+};
+
+let complexExpr = (3 + 2) * (4 - (2 + 1) * 5) / (2 + 3);
+
+import moduleA;
+import moduleB;
+
+x = 1 + 5 * 3;
+
+func testFunc(a : Int64, b : String, c : Boolean) : Void {
+    let localVar : Int64 = 10;
+    if (c) {
+        localVar = 4 * 2;
+    } else {
+        localVar = 1 + 5;
+    };
+};
