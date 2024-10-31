@@ -102,6 +102,31 @@ private:
     Node::Ptr m_else_block;
 };
 
+class KwClass : public Node {
+public:
+    KwClass(const Node::Ptr &name, const Node::Ptr &stmt_list)
+        : Node(KW_CLASS), m_name(name), m_stmt_list(stmt_list ? stmt_list : nullptr) {
+        assert(name);
+    }
+
+    std::string as_string() const override {
+            if (m_stmt_list) {
+                // Wrap statements in CStmtList if there are any statements in the list
+                return fmt::format("Class(n={}, s=CStmtList([{}]))",
+                                   m_name->as_string(),
+                                   m_stmt_list->as_string());
+            } else {
+                // Empty class body
+                return fmt::format("Class(n={}, s=[])",
+                                   m_name->as_string());
+            }
+        }
+
+private:
+    Node::Ptr m_name;
+    Node::Ptr m_stmt_list;
+};
+
 
 class NodeList : public Node {
 public:
