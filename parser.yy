@@ -22,7 +22,7 @@ extern int yylineno;
 
 %token OP_PLUS OP_MINUS OP_MULT OP_DIVF
 
-%token KW_LET KW_FUNC KW_IF KW_IMPORT KW_ELSE
+%token KW_LET KW_FUNC KW_IF KW_IMPORT KW_ELSE KW_CLASS
 
 %token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
 
@@ -47,6 +47,7 @@ stmt_list:
 
 stmt:
     expr
+    | classstmt
     | letstmt
     | assignmentstmt
     | importstmt
@@ -55,6 +56,27 @@ stmt:
     | funcstmt
     ;
 
+classstmt:
+    KW_CLASS identifier OP_LBRACE class_body OP_RBRACE
+    { $$ = Node::add<ast::KwClass>($2, $4); }
+    ;
+
+class_body:
+    class_member_list { $$ = $1; }
+    | %empty { $$ = nullptr; }
+    ;
+
+class_member_list:
+    class_member OP_SEMICOLON class_member_list { $$ = Node::add<ast::NodeList>($1, $3); }
+    | class_member OP_SEMICOLON { $$ = Node::add<ast::NodeList>($1); }
+    ;
+
+class_member:
+    letstmt
+    | funcstmt
+    | %empty { $$ = nullptr; }
+    ;
+    
 assignmentstmt:
     identifier OP_ASSIGN expr { $$ = Node::add<ast::OpAssign>($1, $3); }
     ;
