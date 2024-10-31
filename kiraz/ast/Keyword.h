@@ -51,10 +51,10 @@ public:
         }
         result += fmt::format(", r={}", m_rtype->as_string());
 
-        if(m_scope){
+        if (m_scope) {
             result += fmt::format(", s=[{}])", m_scope->as_string());
-
-        }else{
+        }
+        else {
             result += ", s=[])";
         }
 
@@ -84,16 +84,19 @@ private:
 
 class KwIf : public Node {
 public:
-    explicit KwIf(const Node::Ptr &condition, const Node::Ptr &then_block, const Node::Ptr &else_block)
-        : Node(KW_IF), m_condition(condition), m_then_block(then_block), m_else_block(else_block) {
+    explicit KwIf(
+            const Node::Ptr &condition, const Node::Ptr &then_block, const Node::Ptr &else_block)
+            : Node(KW_IF)
+            , m_condition(condition)
+            , m_then_block(then_block)
+            , m_else_block(else_block) {
         assert(condition);
     }
 
     std::string as_string() const override {
-        return fmt::format("If(?={}, then=[{}], else=[{}])",
-                           m_condition->as_string(),
-                           m_then_block ? m_then_block->as_string() : "",
-                           m_else_block ? m_else_block->as_string() : "");
+        return fmt::format("If(?={}, then=[{}], else=[{}])", m_condition->as_string(),
+                m_then_block ? m_then_block->as_string() : "",
+                m_else_block ? m_else_block->as_string() : "");
     }
 
 private:
@@ -105,28 +108,41 @@ private:
 class KwClass : public Node {
 public:
     KwClass(const Node::Ptr &name, const Node::Ptr &stmt_list)
-        : Node(KW_CLASS), m_name(name), m_stmt_list(stmt_list ? stmt_list : nullptr) {
+            : Node(KW_CLASS), m_name(name), m_stmt_list(stmt_list ? stmt_list : nullptr) {
         assert(name);
     }
 
     std::string as_string() const override {
-            if (m_stmt_list) {
-                // Wrap statements in CStmtList if there are any statements in the list
-                return fmt::format("Class(n={}, s=CStmtList([{}]))",
-                                   m_name->as_string(),
-                                   m_stmt_list->as_string());
-            } else {
-                // Empty class body
-                return fmt::format("Class(n={}, s=[])",
-                                   m_name->as_string());
-            }
+        if (m_stmt_list) {
+            return fmt::format("Class(n={}, s=CStmtList([{}]))", m_name->as_string(),
+                    m_stmt_list->as_string());
         }
+        else {
+            return fmt::format("Class(n={}, s=[])", m_name->as_string());
+        }
+    }
 
 private:
     Node::Ptr m_name;
     Node::Ptr m_stmt_list;
 };
 
+class KwWhile : public Node {
+public:
+    KwWhile(const Node::Ptr &condition, const Node::Ptr &stmt_list)
+            : Node(KW_WHILE), m_condition(condition), m_stmt_list(stmt_list ? stmt_list : nullptr) {
+        assert(condition);
+    }
+    std::string as_string() const override {
+        return fmt::format("While(?={}, repeat=[{}])", 
+                            m_condition->as_string(),
+                            m_stmt_list ? m_stmt_list->as_string(): "");
+    }
+
+private:
+    Node::Ptr m_condition;
+    Node::Ptr m_stmt_list;
+};
 
 class NodeList : public Node {
 public:
