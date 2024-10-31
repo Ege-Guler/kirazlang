@@ -144,7 +144,6 @@ arglist:
     ;
 
 literal:
-      L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
     | L_STRING  { $$ = Node::add<ast::String>(curtoken); }
     ;
 
