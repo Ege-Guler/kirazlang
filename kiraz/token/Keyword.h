@@ -47,11 +47,11 @@ public:
     //     std::string as_string() const override { return "KW_WHILE"; }
     // };
 
-    // class KwClass : public Keyword {
-    // public:
-    //     KwClass() : Keyword(KW_CLASS) {}
-    //     std::string as_string() const override { return "KW_CLASS"; }
-    // };
+class KwClass : public Keyword {
+    public:
+    KwClass() : Keyword(KW_CLASS) {}
+    std::string as_string() const override { return "KW_CLASS"; }
+};
 
 } // namespace token
 
