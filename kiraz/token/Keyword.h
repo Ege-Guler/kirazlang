@@ -27,8 +27,6 @@ public:
     std::string as_string() const override { return "KW_IMPORT"; }
 };
 
-
-
 class KwIf : public Keyword {
 public:
     KwIf() : Keyword(KW_IF) {}
@@ -41,14 +39,14 @@ public:
     std::string as_string() const override { return "KW_ELSE"; }
 };
 
-    // class KwWhile : public Keyword {
-    // public:
-    //     KwWhile() : Keyword(KW_WHILE) {}
-    //     std::string as_string() const override { return "KW_WHILE"; }
-    // };
+class KwWhile : public Keyword {
+public:
+    KwWhile() : Keyword(KW_WHILE) {}
+    std::string as_string() const override { return "KW_WHILE"; }
+};
 
 class KwClass : public Keyword {
-    public:
+public:
     KwClass() : Keyword(KW_CLASS) {}
     std::string as_string() const override { return "KW_CLASS"; }
 };
