@@ -2,6 +2,7 @@
 /build-*
 *.user
 
+/.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -18,6 +19,10 @@
 
 questions.txt
 
+# logs
+*.log
 # kiraz files
-*.ki
+
+# mac artifacts
+.DS_Store
 
