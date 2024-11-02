@@ -117,6 +117,7 @@ expr:
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
     | primary
     | literal
+    | identifier
     ;
 
 primary:
