@@ -4,8 +4,8 @@
 #include <kiraz/ast/Operator.h>
 #include <kiraz/ast/Literal.h>
 #include <kiraz/ast/Keyword.h>
+#include <kiraz/ast/Misc.h>
 #include <kiraz/token/Literal.h>
-
 #include <vector>
 
 int yyerror(const char *msg);
@@ -36,7 +36,7 @@ extern int yylineno;
 %%
 
 code:
-    stmt_list
+    stmt_list { $$ = Node::add<ast::Module>($1); }
     ;
 
 
