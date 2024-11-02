@@ -5,6 +5,24 @@
 
 namespace token {
 
+class Bool : public Token{
+
+public:
+    Bool(bool value) : Token(L_BOOLEAN), m_value(value){}
+    virtual ~Bool();
+
+    std::string as_string() const override{return fmt::format("Boolean{}", m_value); }
+    void print() { fmt::print("{}\n", as_string()); }
+
+    static int colno;
+
+    auto get_value() const { return m_value; }
+
+private:
+    bool m_value;
+};
+
+
 class Integer : public Token {
 public:
     Integer(int64_t base, std::string_view value)

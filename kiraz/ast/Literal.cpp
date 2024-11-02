@@ -5,6 +5,14 @@
 #include <kiraz/token/Literal.h>
 
 namespace ast {
+
+Bool::Bool(Token::Ptr t) : Node(L_BOOLEAN){
+    assert(t->get_id() == L_BOOLEAN);
+    auto token_int = std::static_pointer_cast<const token::Bool>(t);
+    m_value = token_int->get_value();
+
+}
+
 Integer::Integer(Token::Ptr t) : Node(L_INTEGER) {
     assert(t->get_id() == L_INTEGER);
     auto token_int = std::static_pointer_cast<const token::Integer>(t);

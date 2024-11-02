@@ -59,10 +59,11 @@ stmt:
     ;
 
 whilestmt:
-    KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LBRACE stmt_list OP_RBRACE
+    KW_WHILE OP_LPAREN expr OP_RPAREN OP_LBRACE stmt_list OP_RBRACE
     { $$ = Node::add<ast::KwWhile>($3, $6); }
-    |     KW_WHILE OP_LPAREN identifier OP_RPAREN OP_LBRACE OP_RBRACE
+    |     KW_WHILE OP_LPAREN expr OP_RPAREN OP_LBRACE OP_RBRACE
     { $$ = Node::add<ast::KwWhile>($3, nullptr); }
+    ;
 
 classstmt:
     KW_CLASS identifier OP_LBRACE class_body OP_RBRACE
@@ -86,7 +87,7 @@ class_member:
     ;
     
 assignmentstmt:
-    identifier OP_ASSIGN expr { $$ = Node::add<ast::OpAssign>($1, $3); }
+    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3); }
     ;
     
 importstmt:
@@ -94,7 +95,7 @@ importstmt:
     ;
 
 ifstmt:
-    KW_IF OP_LPAREN identifier OP_RPAREN OP_LBRACE option_then OP_RBRACE option_else { $$ = Node::add<ast::KwIf>($3, $6, $8); }
+    KW_IF OP_LPAREN expr OP_RPAREN OP_LBRACE option_then OP_RBRACE option_else { $$ = Node::add<ast::KwIf>($3, $6, $8); }
     ;
     
 option_then:
@@ -118,6 +119,7 @@ expr:
     | primary
     | literal
     | identifier
+    | bool
     ;
 
 primary:
@@ -154,8 +156,12 @@ arglist:
 
 literal:
     | L_STRING  { $$ = Node::add<ast::String>(curtoken); }
+    | bool
     ;
 
+bool :
+    L_BOOLEAN { $$ = Node::add<ast::Bool>(curtoken); }
+    ;
 identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken); }
     ;

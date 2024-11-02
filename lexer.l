@@ -16,6 +16,10 @@ extern std::shared_ptr<Token> curtoken;
 
 %%
 
+"true"  { colno += yyleng; curtoken = Token::New<Bool>(true); return L_BOOLEAN; }
+"false" { colno += yyleng; curtoken = Token::New<Bool>(false); return L_BOOLEAN; }
+
+
 [0-9]+ { colno += yyleng; curtoken = Token::New<Integer>(10, yytext); return L_INTEGER; }
 \"([^"\\]|\\.)*\" { colno += yyleng; curtoken = Token::New<String>(yytext); return L_STRING; }
 "+"   { colno += yyleng; curtoken = Token::New<OpPlus>(); return OP_PLUS; }

@@ -4,6 +4,16 @@
 #include <kiraz/Node.h>
 
 namespace ast {
+
+class Bool: public Node{
+public:
+    Bool(Token::Ptr);
+    std::string as_string() const override { return fmt::format("Bool({})", m_value ? "true":"false"); }
+    
+private:
+    int64_t m_value;
+};
+
 class Integer : public Node {
 public:
     Integer(Token::Ptr);
