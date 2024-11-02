@@ -26,6 +26,8 @@ extern int yylineno;
 
 %token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
 
+%token OP_EQ OP_GT OP_GE OP_LT OP_LE
+
 %token IDENTIFIER
 
 %token L_INTEGER L_STRING L_BOOLEAN
@@ -116,6 +118,11 @@ expr:
     | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
+    | expr OP_EQ expr { $$ = Node::add<ast::OpEq>($1, $3); }
+    | expr OP_GT expr { $$ = Node::add<ast::OpGt>($1, $3); }
+    | expr OP_GE expr { $$ = Node::add<ast::OpGe>($1, $3); }
+    | expr OP_LT expr { $$ = Node::add<ast::OpLt>($1, $3); }
+    | expr OP_LE expr { $$ = Node::add<ast::OpLe>($1, $3); }
     | primary
     | literal
     | identifier
