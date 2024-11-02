@@ -43,18 +43,31 @@ public:
 
     std::string as_string() const override {
         std::string result = fmt::format("Func(n={}", m_name->as_string());
+
         if (m_args) {
-            result += fmt::format(", a={}", m_args->as_string());
-        }
-        else {
+            
+            std::string args_str = m_args->as_string();
+            
+            size_t pos = 0;
+            while ((pos = args_str.find("], [", pos)) != std::string::npos) {
+                args_str.replace(pos, 4, ", ");
+            }
+            
+            if (args_str.find("FuncArgs([") == 0 && args_str.rfind("])") == args_str.size() - 2) {
+                args_str = args_str.substr(10, args_str.size() - 12);
+            }
+            
+            result += fmt::format(", a=FuncArgs([{}])", args_str);
+            
+        } else {
             result += ", a=[]";
         }
+
         result += fmt::format(", r={}", m_rtype->as_string());
 
         if (m_scope) {
             result += fmt::format(", s=[{}])", m_scope->as_string());
-        }
-        else {
+        } else {
             result += ", s=[])";
         }
 
@@ -67,6 +80,7 @@ private:
     Node::Ptr m_rtype;
     Node::Ptr m_scope;
 };
+
 
 class KwImport : public Node {
 public:
