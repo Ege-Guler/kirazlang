@@ -39,6 +39,21 @@ public:
         case OP_ASSIGN:
             opstr = "Assign";
             break;
+        case OP_EQ:
+            opstr = "OpEq";
+            break;
+        case OP_GT:
+            opstr = "OpGt";
+            break;
+        case OP_GE:
+            opstr = "OpGe";
+            break;
+        case OP_LT:
+            opstr = "OpLt";
+            break;
+        case OP_LE:
+            opstr = "OpLe";
+            break;
         default:
             break;
         }
@@ -75,6 +90,38 @@ class OpAssign : public OpBinary {
 public:
     OpAssign(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_ASSIGN, left, right) {}
 };
+
+class OpEq : public OpBinary {
+public:
+    OpEq(const Node::Ptr &left, const Node::Ptr &right) :
+        OpBinary(OP_EQ, left, right) {}
+};
+
+class OpGt : public OpBinary {
+public:
+    OpGt(const Node::Ptr &left, const Node::Ptr &right) :
+        OpBinary(OP_GT, left, right) {}
+};
+
+class OpGe : public OpBinary {
+public:
+    OpGe(const Node::Ptr &left, const Node::Ptr &right) :
+        OpBinary(OP_GE, left, right) {}
+};
+
+class OpLt : public OpBinary {
+public:
+    OpLt(const Node::Ptr &left, const Node::Ptr &right) :
+        OpBinary(OP_LT, left, right) {}
+};
+
+class OpLe : public OpBinary {
+public:
+    OpLe(const Node::Ptr &left, const Node::Ptr &right) :
+        OpBinary(OP_LE, left, right) {}
+};
+
+
 }
 
 #endif // KIRAZ_AST_OPERATOR_H
