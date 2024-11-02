@@ -28,7 +28,10 @@ private:
 
 class String : public Token {
 public:
-    String(std::string_view value) : Token(L_STRING), m_value(value) {}
+    String(std::string value) : Token(L_STRING) {
+        std::replace(value.begin(), value.end(), '"', '\0');
+        m_value = value;
+    }
     virtual ~String();
 
     std::string as_string() const override { return fmt::format("Str{}", m_value); }
@@ -38,10 +41,10 @@ public:
     static int colno;
 
     auto get_value() const { return m_value; }
-
-private:
+private : 
     int m_id;
     std::string m_value;
+
 };
 
 class Identifier : public Token {
@@ -58,7 +61,6 @@ public:
 private:
     std::string m_value;
 };
-
 }
 
 #endif // KIRAZ_TOKEN_LITERAL_H

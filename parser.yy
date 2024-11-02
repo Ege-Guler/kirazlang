@@ -55,6 +55,7 @@ stmt:
     | identifier
     | funcstmt
     | whilestmt
+    | literal
     ;
 
 whilestmt:
