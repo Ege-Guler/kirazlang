@@ -19,6 +19,8 @@
 
 questions.txt
 
+# logs
+*.log
 # kiraz files
 
 # mac artifacts
