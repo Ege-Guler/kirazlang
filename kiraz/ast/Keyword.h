@@ -128,7 +128,7 @@ public:
 
     std::string as_string() const override {
         if (m_stmt_list) {
-            return fmt::format("Class(n={}, s=CStmtList([{}]))", m_name->as_string(),
+            return fmt::format("Class(n={}, s=[{}])", m_name->as_string(),
                     m_stmt_list->as_string());
         }
         else {
