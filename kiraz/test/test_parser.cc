@@ -13,7 +13,7 @@ struct ParserFixture : public testing::Test {
 
     void SetUp() override {
         Node::reset_root();
-        // yydebug = 1; // uncomment to your heart's content
+        yydebug = 1; // uncomment to your heart's content
     }
 
     void TearDown() override {

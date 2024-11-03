@@ -89,8 +89,16 @@ class_member:
     ;
     
 assignmentstmt:
-    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3); }
+    identifier OP_ASSIGN expr
+    {
+        if (!$3) {
+            $$ = nullptr;
+        } else {
+            $$ = Node::add<ast::OpAssign>($1, $3);
+        }
+    }
     ;
+    
     
 importstmt:
     KW_IMPORT identifier { $$ = Node::add<ast::KwImport>($2); }
@@ -114,7 +122,7 @@ option_else:
     
 
 expr:
-    expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
+     expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
     | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
