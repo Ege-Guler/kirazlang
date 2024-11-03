@@ -47,7 +47,38 @@ private:
 class String : public Token {
 public:
     String(std::string value) : Token(L_STRING) {
-        std::replace(value.begin(), value.end(), '"', '\0');
+
+        for (size_t i = 0; i < value.length(); ++i) {
+            if (value[i] == '\\' && i + 1 < value.length()) {
+                switch (value[i + 1]) {
+                    case 'n':
+                        value.replace(i, 2, "\n");
+                        break;
+                    case 't':
+                        value.replace(i, 2, "\t");
+                        break;
+                    case 'r':
+                        value.replace(i, 2, "\r");
+                        break;
+                    case 'b':
+                        value.replace(i, 2, "\b");
+                        break;
+                    case 'f':
+                        value.replace(i, 2, "\f");
+                        break;
+                    case '\\':
+                        value.replace(i, 2, "\\");
+                        break;
+                    case '"':
+                        value.replace(i, 2, "\"");
+                        break;
+                    default:
+                        continue;
+                }
+            }
+        }
+        
+        value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
         m_value = value;
     }
     virtual ~String();
