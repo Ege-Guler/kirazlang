@@ -20,8 +20,7 @@ extern std::shared_ptr<Token> curtoken;
 "false" { colno += yyleng; curtoken = Token::New<Bool>(false); return L_BOOLEAN; }
 
 
-[0-9]+ { colno += yyleng; curtoken = Token::New<Integer>(10, yytext); return L_INTEGER; }
-\"([^"\\]|\\.)*\" { colno += yyleng; curtoken = Token::New<String>(yytext); return L_STRING; }
+
 "+"   { colno += yyleng; curtoken = Token::New<OpPlus>(); return OP_PLUS; }
 "-"   { colno += yyleng; curtoken = Token::New<OpMinus>(); return OP_MINUS; }
 "*"   { colno += yyleng; curtoken = Token::New<OpMult>(); return OP_MULT; }
@@ -51,6 +50,9 @@ extern std::shared_ptr<Token> curtoken;
 
 
 [a-zA-Z_][a-zA-Z0-9_]* { colno += yyleng; curtoken = Token::New<Identifier>(yytext); return IDENTIFIER; }
+[0-9]+ { colno += yyleng; curtoken = Token::New<Integer>(10, yytext); return L_INTEGER; }
+\"([^"\\]|\\.)*\" { colno += yyleng; curtoken = Token::New<String>(yytext); return L_STRING; }
+
 
 [ \n\t]+ {colno += yyleng;}
 .       {colno += yyleng; curtoken = Token::New<Rejected>(yytext); return YYUNDEF; }
