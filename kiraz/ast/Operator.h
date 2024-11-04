@@ -55,7 +55,7 @@ public:
             opstr = "OpLe";
             break;
         case OP_DOT:
-            opstr = "OpDot";
+            opstr = "Dot";
             break;
         default:
             break;

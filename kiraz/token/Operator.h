@@ -114,7 +114,7 @@ public:
 class OpDot : public Operator {
 public:
     OpDot() : Operator(OP_DOT) {}
-    std::string as_string() const override { return "OP_DOT"; }
+    std::string as_string() const override { return "DOT"; }
 };
 
 
