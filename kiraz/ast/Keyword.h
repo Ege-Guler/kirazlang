@@ -158,6 +158,20 @@ private:
     Node::Ptr m_stmt_list;
 };
 
+class KwReturn : public Node {
+public:
+    explicit KwReturn(const Node::Ptr &value)
+        : Node(KW_RETURN), m_value(value) {
+        assert(value);
+    }
+
+    std::string as_string() const override {
+        return fmt::format("Return({})", m_value->as_string());
+    }
+
+private:
+    Node::Ptr m_value;
+};
 
 
 } // namespace ast

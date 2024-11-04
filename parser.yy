@@ -28,6 +28,8 @@ extern int yylineno;
 
 %token OP_EQ OP_GT OP_GE OP_LT OP_LE
 
+%token KW_RETURN
+
 %token IDENTIFIER
 
 %token L_INTEGER L_STRING L_BOOLEAN
@@ -58,8 +60,16 @@ stmt:
     | funcstmt
     | whilestmt
     | literal
+    | returnstmt
     ;
 
+returnstmt:
+KW_RETURN expr {
+    if(!$2) {
+        $$ = nullptr;
+    }else {$$ = Node::add<ast::KwReturn>($2); }}
+    ;
+    
 whilestmt:
     KW_WHILE OP_LPAREN expr OP_RPAREN OP_LBRACE stmt_list OP_RBRACE
     { $$ = Node::add<ast::KwWhile>($3, $6); }
