@@ -54,6 +54,9 @@ public:
         case OP_LE:
             opstr = "OpLe";
             break;
+        case OP_DOT:
+            opstr = "OpDot";
+            break;
         default:
             break;
         }
@@ -114,6 +117,11 @@ public:
 class OpLe : public OpBinary {
 public:
     OpLe(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_LE, left, right) {}
+};
+
+class OpDot : public OpBinary {
+public:
+    OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
 };
 
 }
