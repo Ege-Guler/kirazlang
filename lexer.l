@@ -20,8 +20,7 @@ extern std::shared_ptr<Token> curtoken;
 "false" { colno += yyleng; curtoken = Token::New<Bool>(false); return L_BOOLEAN; }
 
 
-[0-9]+ { colno += yyleng; curtoken = Token::New<Integer>(10, yytext); return L_INTEGER; }
-\"([^"\\]|\\.)*\" { colno += yyleng; curtoken = Token::New<String>(yytext); return L_STRING; }
+
 "+"   { colno += yyleng; curtoken = Token::New<OpPlus>(); return OP_PLUS; }
 "-"   { colno += yyleng; curtoken = Token::New<OpMinus>(); return OP_MINUS; }
 "*"   { colno += yyleng; curtoken = Token::New<OpMult>(); return OP_MULT; }
@@ -39,7 +38,7 @@ extern std::shared_ptr<Token> curtoken;
 ">=" { colno += yyleng; curtoken = Token::New<OpGe>(); return OP_GE; }
 "<"  { colno += yyleng; curtoken = Token::New<OpLt>(); return OP_LT; }
 "<=" { colno += yyleng; curtoken = Token::New<OpLe>(); return OP_LE; }
-
+"."   { colno += yyleng; curtoken = Token::New<OpDot>(); return OP_DOT; }
 
 "let"    { colno += yyleng; curtoken = Token::New<KwLet>(); return KW_LET; }
 "func"   { colno += yyleng; curtoken = Token::New<KwFunc>(); return KW_FUNC; }
@@ -48,9 +47,13 @@ extern std::shared_ptr<Token> curtoken;
 "else"   { colno += yyleng; curtoken = Token::New<KwElse>(); return KW_ELSE; }
 "class"  { colno += yyleng; curtoken = Token::New<KwClass>(); return KW_CLASS; }
 "while"  { colno += yyleng; curtoken = Token::New<KwWhile>(); return KW_WHILE; }
+"return" { colno += yyleng; curtoken = Token::New<KwReturn>(); return KW_RETURN; }
 
 
 [a-zA-Z_][a-zA-Z0-9_]* { colno += yyleng; curtoken = Token::New<Identifier>(yytext); return IDENTIFIER; }
+[0-9]+ { colno += yyleng; curtoken = Token::New<Integer>(10, yytext); return L_INTEGER; }
+\"([^"\\]|\\.)*\" { colno += yyleng; curtoken = Token::New<String>(yytext); return L_STRING; }
+
 
 [ \n\t]+ {colno += yyleng;}
 .       {colno += yyleng; curtoken = Token::New<Rejected>(yytext); return YYUNDEF; }

@@ -128,7 +128,7 @@ public:
 
     std::string as_string() const override {
         if (m_stmt_list) {
-            return fmt::format("Class(n={}, s=CStmtList([{}]))", m_name->as_string(),
+            return fmt::format("Class(n={}, s=[{}])", m_name->as_string(),
                     m_stmt_list->as_string());
         }
         else {
@@ -158,6 +158,20 @@ private:
     Node::Ptr m_stmt_list;
 };
 
+class KwReturn : public Node {
+public:
+    explicit KwReturn(const Node::Ptr &value)
+        : Node(KW_RETURN), m_value(value) {
+        assert(value);
+    }
+
+    std::string as_string() const override {
+        return fmt::format("Return({})", m_value->as_string());
+    }
+
+private:
+    Node::Ptr m_value;
+};
 
 
 } // namespace ast

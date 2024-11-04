@@ -24,9 +24,11 @@ extern int yylineno;
 
 %token KW_LET KW_FUNC KW_IF KW_IMPORT KW_ELSE KW_CLASS KW_WHILE
 
-%token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
+%token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA OP_DOT
 
 %token OP_EQ OP_GT OP_GE OP_LT OP_LE
+
+%token KW_RETURN
 
 %token IDENTIFIER
 
@@ -34,6 +36,9 @@ extern int yylineno;
 
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
+
+%nonassoc OP_EQ OP_GT OP_GE OP_LT OP_LE
+%precedence OP_LPAREN
 
 %%
 
@@ -58,8 +63,16 @@ stmt:
     | funcstmt
     | whilestmt
     | literal
+    | returnstmt
     ;
 
+returnstmt:
+KW_RETURN expr {
+    if(!$2) {
+        $$ = nullptr;
+    }else {$$ = Node::add<ast::KwReturn>($2); }}
+    ;
+    
 whilestmt:
     KW_WHILE OP_LPAREN expr OP_RPAREN OP_LBRACE stmt_list OP_RBRACE
     { $$ = Node::add<ast::KwWhile>($3, $6); }
@@ -89,8 +102,16 @@ class_member:
     ;
     
 assignmentstmt:
-    identifier OP_ASSIGN stmt { $$ = Node::add<ast::OpAssign>($1, $3); }
+    identifier OP_ASSIGN expr
+    {
+        if (!$3) {
+            $$ = nullptr;
+        } else {
+            $$ = Node::add<ast::OpAssign>($1, $3);
+        }
+    }
     ;
+    
     
 importstmt:
     KW_IMPORT identifier { $$ = Node::add<ast::KwImport>($2); }
@@ -114,7 +135,8 @@ option_else:
     
 
 expr:
-    expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
+    exprparen
+    | expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
     | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
@@ -123,21 +145,22 @@ expr:
     | expr OP_GE expr { $$ = Node::add<ast::OpGe>($1, $3); }
     | expr OP_LT expr { $$ = Node::add<ast::OpLt>($1, $3); }
     | expr OP_LE expr { $$ = Node::add<ast::OpLe>($1, $3); }
-    | primary
+    | expr OP_DOT identifier { $$ = Node::add<ast::OpDot>($1, $3); }
+    | expr OP_LPAREN calllist OP_RPAREN { $$ = Node::add<ast::Call>($1, $3); }
+    ;
+    
+exprparen:
+    OP_LPAREN expr OP_RPAREN { $$ = $2; }
+    | posneg
     | literal
     | identifier
     | bool
     ;
 
-primary:
-    OP_LPAREN expr OP_RPAREN { $$ = $2; }
-    | posneg
-    ;
-
 posneg:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
-    | OP_PLUS primary { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
-    | OP_MINUS primary { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
+    | OP_PLUS exprparen { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
+    | OP_MINUS exprparen { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
     ;
 
 letstmt:
@@ -161,9 +184,15 @@ arglist:
     | %empty { $$ = nullptr; }
     ;
 
+calllist:
+    expr OP_COMMA calllist { $$ = Node::add<ast::CallList>($1, $3); }
+    | expr { $$ = Node::add<ast::CallList>($1); }
+    | %empty { $$ = nullptr; }
+    ;
+
+
 literal:
     | L_STRING  { $$ = Node::add<ast::String>(curtoken); }
-    | bool
     ;
 
 bool :

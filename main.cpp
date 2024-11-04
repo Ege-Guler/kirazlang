@@ -34,15 +34,23 @@ inline static bool ends_with(const std::string &value, const std::string &ending
 }
 
 static int test(std::string_view str) {
-    auto buffer = yy_scan_string(str.data());
-    auto ret = yyparse();
-    yy_delete_buffer(buffer);
 
-    if (Node::current_root()) {
-        fmt::print("{}\n", Node::current_root()->as_string());
+    try {
+        auto buffer = yy_scan_string(str.data());
+        auto ret = yyparse();
+        yy_delete_buffer(buffer);
+
+        if (Node::current_root()) {
+            fmt::print("{}\n", Node::current_root()->as_string());
+
+        }
+    
+        return ret;
     }
-
-    return ret;
+    catch (const std::runtime_error &e) {
+        std::cerr << "Error" << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 }
 
 static int usage(int argc, char **argv) {
@@ -70,8 +78,8 @@ static int handle_mode_file(std::string_view arg) {
         f.open(file_path);
 
         if (f.is_open()) {
-            std::string file_content((std::istreambuf_iterator<char>(f)),
-            std::istreambuf_iterator<char>());
+            std::string file_content(
+                    (std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 
             f.close();
             if (auto ret = test(file_content); ret != OK) {
@@ -80,10 +88,11 @@ static int handle_mode_file(std::string_view arg) {
             else {
                 return ERR;
             }
-        }else{
+        }
+        else {
             std::cerr << "Failed to open file: " << file_path << std::endl;
         }
-    }  
+    }
     return ERR;
 }
 

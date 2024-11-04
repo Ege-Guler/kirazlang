@@ -3,8 +3,8 @@
 
 #include <cassert>
 
+#include <iostream>
 #include <kiraz/Node.h>
-
 namespace ast {
 class OpBinary : public Node {
 protected:
@@ -54,6 +54,9 @@ public:
         case OP_LE:
             opstr = "OpLe";
             break;
+        case OP_DOT:
+            opstr = "Dot";
+            break;
         default:
             break;
         }
@@ -93,34 +96,33 @@ public:
 
 class OpEq : public OpBinary {
 public:
-    OpEq(const Node::Ptr &left, const Node::Ptr &right) :
-        OpBinary(OP_EQ, left, right) {}
+    OpEq(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_EQ, left, right) {}
 };
 
 class OpGt : public OpBinary {
 public:
-    OpGt(const Node::Ptr &left, const Node::Ptr &right) :
-        OpBinary(OP_GT, left, right) {}
+    OpGt(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_GT, left, right) {}
 };
 
 class OpGe : public OpBinary {
 public:
-    OpGe(const Node::Ptr &left, const Node::Ptr &right) :
-        OpBinary(OP_GE, left, right) {}
+    OpGe(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_GE, left, right) {}
 };
 
 class OpLt : public OpBinary {
 public:
-    OpLt(const Node::Ptr &left, const Node::Ptr &right) :
-        OpBinary(OP_LT, left, right) {}
+    OpLt(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_LT, left, right) {}
 };
 
 class OpLe : public OpBinary {
 public:
-    OpLe(const Node::Ptr &left, const Node::Ptr &right) :
-        OpBinary(OP_LE, left, right) {}
+    OpLe(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_LE, left, right) {}
 };
 
+class OpDot : public OpBinary {
+public:
+    OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
+};
 
 }
 
