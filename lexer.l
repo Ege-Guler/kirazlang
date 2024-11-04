@@ -38,7 +38,7 @@ extern std::shared_ptr<Token> curtoken;
 ">=" { colno += yyleng; curtoken = Token::New<OpGe>(); return OP_GE; }
 "<"  { colno += yyleng; curtoken = Token::New<OpLt>(); return OP_LT; }
 "<=" { colno += yyleng; curtoken = Token::New<OpLe>(); return OP_LE; }
-
+"."   { colno += yyleng; curtoken = Token::New<OpDot>(); return OP_DOT; }
 
 "let"    { colno += yyleng; curtoken = Token::New<KwLet>(); return KW_LET; }
 "func"   { colno += yyleng; curtoken = Token::New<KwFunc>(); return KW_FUNC; }

@@ -79,6 +79,60 @@ private:
     std::vector<std::pair<Node::Ptr, Node::Ptr>> m_args;
 };
 
+class CallList : public Node {
+public:
+    
+    explicit CallList(const Node::Ptr &arg) : Node(0) {
+        m_args.push_back(arg);
+    }
+
+    CallList(const Node::Ptr &first, const Node::Ptr &rest) : Node(0) {
+        m_args.push_back(first);
+        if (rest) {
+            auto restList = std::dynamic_pointer_cast<CallList>(rest);
+            if (restList) {
+                m_args.insert(m_args.end(), restList->m_args.begin(), restList->m_args.end());
+            } else {
+                m_args.push_back(rest);
+            }
+        }
+    }
+
+    std::string as_string() const override {
+        std::string result = "FuncArgs([";
+        for (size_t i = 0; i < m_args.size(); ++i) {
+            result += m_args[i]->as_string();
+            if (i < m_args.size() - 1) {
+                result += ", ";
+            }
+        }
+        result += "])";
+        return result;
+    }
+
+private:
+    std::vector<Node::Ptr> m_args;
+};
+
+
+class Call : public Node {
+public:
+    Call(const Node::Ptr &callee, const Node::Ptr &args)
+        : Node(0), m_callee(callee), m_args(args) {
+        assert(callee);
+    }
+
+    std::string as_string() const override {
+        return fmt::format("Call(n={}, a={})",
+                           m_callee->as_string(),
+                           m_args ? m_args->as_string() : "[]");
+    }
+
+private:
+    Node::Ptr m_callee;
+    Node::Ptr m_args;
+};
+
 } // namespace ast
 
 #endif // KIRAZ_AST_MISC_H

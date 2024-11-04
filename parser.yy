@@ -24,7 +24,7 @@ extern int yylineno;
 
 %token KW_LET KW_FUNC KW_IF KW_IMPORT KW_ELSE KW_CLASS KW_WHILE
 
-%token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA
+%token OP_ASSIGN OP_COLON OP_SEMICOLON OP_COMMA OP_DOT
 
 %token OP_EQ OP_GT OP_GE OP_LT OP_LE
 
@@ -141,12 +141,14 @@ expr:
     | expr OP_GE expr { $$ = Node::add<ast::OpGe>($1, $3); }
     | expr OP_LT expr { $$ = Node::add<ast::OpLt>($1, $3); }
     | expr OP_LE expr { $$ = Node::add<ast::OpLe>($1, $3); }
+    | expr OP_DOT identifier { $$ = Node::add<ast::OpDot>($1, $3); }
+    | expr OP_LPAREN arglist OP_RPAREN { $$ = Node::add<ast::Call>($1, $3); }
     | primary
     | literal
     | identifier
     | bool
     ;
-
+    
 primary:
     OP_LPAREN expr OP_RPAREN { $$ = $2; }
     | posneg
@@ -176,6 +178,8 @@ funcstmt:
 arglist:
     identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3, $5); }
     | identifier OP_COLON identifier { $$ = Node::add<ast::ArgList>($1, $3, nullptr); }
+    | expr OP_COMMA arglist { $$ = Node::add<ast::CallList>($1, $3); }
+    | expr { $$ = Node::add<ast::CallList>($1); }
     | %empty { $$ = nullptr; }
     ;
 
