@@ -37,6 +37,9 @@ extern int yylineno;
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
 
+%nonassoc OP_EQ OP_GT OP_GE OP_LT OP_LE
+%precedence OP_LPAREN
+
 %%
 
 code:
@@ -132,7 +135,8 @@ option_else:
     
 
 expr:
-     expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
+    exprparen
+    | expr OP_PLUS expr { $$ = Node::add<ast::OpAdd>($1, $3); }
     | expr OP_MINUS expr { $$ = Node::add<ast::OpSub>($1, $3); }
     | expr OP_MULT expr { $$ = Node::add<ast::OpMult>($1, $3); }
     | expr OP_DIVF expr { $$ = Node::add<ast::OpDivF>($1, $3); }
@@ -142,22 +146,21 @@ expr:
     | expr OP_LT expr { $$ = Node::add<ast::OpLt>($1, $3); }
     | expr OP_LE expr { $$ = Node::add<ast::OpLe>($1, $3); }
     | expr OP_DOT identifier { $$ = Node::add<ast::OpDot>($1, $3); }
-    | expr OP_LPAREN arglist OP_RPAREN { $$ = Node::add<ast::Call>($1, $3); }
-    | primary
+    | expr OP_LPAREN calllist OP_RPAREN { $$ = Node::add<ast::Call>($1, $3); }
+    ;
+    
+exprparen:
+    OP_LPAREN expr OP_RPAREN { $$ = $2; }
+    | posneg
     | literal
     | identifier
     | bool
     ;
-    
-primary:
-    OP_LPAREN expr OP_RPAREN { $$ = $2; }
-    | posneg
-    ;
 
 posneg:
     L_INTEGER { $$ = Node::add<ast::Integer>(curtoken); }
-    | OP_PLUS primary { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
-    | OP_MINUS primary { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
+    | OP_PLUS exprparen { $$ = Node::add<ast::SignedNode>(OP_PLUS, $2); }
+    | OP_MINUS exprparen { $$ = Node::add<ast::SignedNode>(OP_MINUS, $2); }
     ;
 
 letstmt:
@@ -178,14 +181,18 @@ funcstmt:
 arglist:
     identifier OP_COLON identifier OP_COMMA arglist { $$ = Node::add<ast::ArgList>($1, $3, $5); }
     | identifier OP_COLON identifier { $$ = Node::add<ast::ArgList>($1, $3, nullptr); }
-    | expr OP_COMMA arglist { $$ = Node::add<ast::CallList>($1, $3); }
+    | %empty { $$ = nullptr; }
+    ;
+
+calllist:
+    expr OP_COMMA calllist { $$ = Node::add<ast::CallList>($1, $3); }
     | expr { $$ = Node::add<ast::CallList>($1); }
     | %empty { $$ = nullptr; }
     ;
 
+
 literal:
     | L_STRING  { $$ = Node::add<ast::String>(curtoken); }
-    | bool
     ;
 
 bool :
