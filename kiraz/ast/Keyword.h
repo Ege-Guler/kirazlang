@@ -108,9 +108,18 @@ public:
     }
 
     std::string as_string() const override {
-        return fmt::format("If(?={}, then=[{}], else=[{}])", m_condition->as_string(),
-                m_then_block ? m_then_block->as_string() : "",
-                m_else_block ? m_else_block->as_string() : "");
+        std::string else_str;
+
+        if (m_else_block && dynamic_cast<KwIf*>(m_else_block.get())) {
+            else_str = m_else_block->as_string();
+        } else {
+            else_str = fmt::format("[{}]", m_else_block ? m_else_block->as_string() : "");
+        }
+
+        return fmt::format("If(?={}, then=[{}], else={})",
+                           m_condition->as_string(),
+                           m_then_block ? m_then_block->as_string() : "",
+                           else_str);
     }
 
 private:
@@ -118,6 +127,7 @@ private:
     Node::Ptr m_then_block;
     Node::Ptr m_else_block;
 };
+
 
 class KwClass : public Node {
 public:
