@@ -4,25 +4,8 @@
 #include <cassert>
 #include <kiraz/Node.h>
 #include <vector>
-
+#include <kiraz/Compiler.h>
 namespace ast {
-
-class Module : public Node {
-public:
-    explicit Module(const Node::Ptr &stmt_list) : Node(0), m_stmt_list(stmt_list) {}
-
-    std::string as_string() const override {
-        if (m_stmt_list) {
-            return fmt::format("Module([{}])", m_stmt_list->as_string());
-        }
-        else {
-            return "Module([])";
-        }
-    }
-
-private:
-    Node::Ptr m_stmt_list;
-};
 
 class NodeList : public Node {
 public:
@@ -45,9 +28,80 @@ public:
         return result;
     }
 
+    const std::vector<Node::Ptr> &get_nodes() const {
+        return m_nodes;
+    }
+
+
 private:
-    std::vector<Node::Ptr> m_nodes;
+std::vector<Node::Ptr> m_nodes;
+
+
 };
+
+
+class Module : public Node {
+public:
+    explicit Module(const Node::Ptr &stmt_list) : Node(0), m_stmt_list(stmt_list) {
+        
+    }
+
+    std::string as_string() const override {
+        if (m_stmt_list) {
+            return fmt::format("Module([{}])", m_stmt_list->as_string());
+        }
+        else {
+            return "Module([])";
+        }
+    }
+
+    Ptr compute_stmt_type(SymbolTable &st) override{
+        set_cur_symtab(st.get_cur_symtab());
+        add_to_symtab_ordered(st);
+
+    if (m_stmt_list) {
+        // Cast m_stmt_list to NodeList
+        auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
+        if (!node_list) {
+            return set_error("Invalid NodeList in Module");
+        }
+
+        // Traverse the NodeList
+        for (const auto &node : node_list->get_nodes()) {
+            if (node) {
+                // Call compute_stmt_type on each child node
+                if (auto error = node->compute_stmt_type(st)) {
+                    return error; // Propagate errors
+                }
+            }
+        }
+    }
+        return nullptr;
+    }
+
+    Ptr add_to_symtab_ordered(SymbolTable &st) override{
+        
+        auto moduel_scope = st.enter_scope(ScopeType::Module, shared_from_this());
+
+        st.add_symbol("Boolean", shared_from_this());
+        st.add_symbol("fun", shared_from_this());
+        st.add_symbol("class", shared_from_this());
+        st.add_symbol("Integer64", shared_from_this());
+        st.add_symbol("String", shared_from_this());
+        st.add_symbol("Void", shared_from_this());
+        st.add_symbol("void", shared_from_this());
+        st.add_symbol("and", shared_from_this());
+        st.add_symbol("or", shared_from_this());
+        st.add_symbol("not", shared_from_this());
+
+        return nullptr;
+    }
+
+private:
+    Node::Ptr m_stmt_list;
+};
+
+
 class ArgList : public Node {
 public:
     explicit ArgList(const Node::Ptr &identifier, const Node::Ptr &type) : Node(0) {
