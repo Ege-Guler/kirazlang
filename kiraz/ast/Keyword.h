@@ -4,6 +4,8 @@
 #include <cassert>
 #include <kiraz/Node.h>
 #include <vector>
+#include <kiraz/Compiler.h>
+#include <iostream>
 
 namespace ast {
 
@@ -158,9 +160,22 @@ public:
         assert(condition);
     }
     std::string as_string() const override {
+        std::cout << "wihle";
         return fmt::format("While(?={}, repeat=[{}])", 
                             m_condition->as_string(),
                             m_stmt_list ? m_stmt_list->as_string(): "");
+    }
+
+    Ptr compute_stmt_type(SymbolTable &st) override{
+        std::cout << "wihle";
+
+        set_cur_symtab(st.get_cur_symtab());
+        if (st.get_scope_type() == ScopeType::Module) {
+            return set_error("Misplaced while statement");
+                        
+        }
+    
+        return nullptr;
     }
 
 private:
