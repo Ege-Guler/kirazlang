@@ -57,6 +57,7 @@ struct CompilerFixture : public ::testing::Test {
     }
 
     void verify_error(const std::string &code) {
+        testing::internal::CaptureStdout();
         Compiler compiler;
 
         std::stringstream ostr;
@@ -68,6 +69,7 @@ struct CompilerFixture : public ::testing::Test {
         if (Node::get_root_before()) {
             fmt::print("ERR?: {}\n", *Node::get_root_before());
         }
+        std::string output = testing::internal::GetCapturedStdout();
 
         ASSERT_FALSE(Node::get_root_before());
     }
