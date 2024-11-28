@@ -142,38 +142,48 @@ private:
 
 class KwClass : public Node {
 public:
-    KwClass(const Node::Ptr &name, const Node::Ptr &stmt_list)
-            : Node(KW_CLASS), m_name(name), m_stmt_list(stmt_list ? stmt_list : nullptr) {
+    KwClass(const Node::Ptr &name, const Node::Ptr &stmt_list, const Node::Ptr &base_name = nullptr)
+        : Node(KW_CLASS), m_name(name), m_stmt_list(stmt_list ? stmt_list : nullptr), m_base_name(base_name) {
         assert(name);
     }
 
     std::string as_string() const override {
-        if (m_stmt_list) {
-            return fmt::format("Class(n={}, s=[{}])", m_name->as_string(),
-                    m_stmt_list->as_string());
-        }
-        else {
-            return fmt::format("Class(n={}, s=[])", m_name->as_string());
+        if (m_base_name) {
+            return fmt::format("Class(n={}, base={}, s=[{}])",
+                               m_name->as_string(),
+                               m_base_name->as_string(),
+                               m_stmt_list ? m_stmt_list->as_string() : "");
+        } else {
+            return fmt::format("Class(n={}, s=[{}])",
+                               m_name->as_string(),
+                               m_stmt_list ? m_stmt_list->as_string() : "");
         }
     }
 
-    Ptr compute_stmt_type(SymbolTable &st) override{
-
+    Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
         
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
-
         if (std::islower(iden->get_value()[0])) {
-            return set_error(fmt::format("Class name '{}' can not start with an lowercase letter", iden->get_value()));
-            
+            return set_error(fmt::format("Class name '{}' cannot start with a lowercase letter", iden->get_value()));
         }
+
+        if (m_base_name) {
+            auto base_iden = std::dynamic_pointer_cast<ast::Identifier>(m_base_name);
+            if (std::islower(base_iden->get_value()[0])) {
+                return set_error(fmt::format("Base class name '{}' cannot start with a lowercase letter", base_iden->get_value()));
+            }
+        }
+
         return nullptr;
     }
 
 private:
     Node::Ptr m_name;
     Node::Ptr m_stmt_list;
+    Node::Ptr m_base_name;
 };
+
 
 class KwWhile : public Node {
 public:
