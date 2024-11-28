@@ -6,6 +6,7 @@
 #include <vector>
 #include <kiraz/Compiler.h>
 #include <iostream>
+#include <cctype>
 
 namespace ast {
 
@@ -154,6 +155,19 @@ public:
         else {
             return fmt::format("Class(n={}, s=[])", m_name->as_string());
         }
+    }
+
+    Ptr compute_stmt_type(SymbolTable &st) override{
+
+        set_cur_symtab(st.get_cur_symtab());
+        
+        auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+
+        if (std::islower(iden->get_value()[0])) {
+            return set_error(fmt::format("Class name '{}' can not start with an lowercase letter", iden->get_value()));
+            
+        }
+        return nullptr;
     }
 
 private:

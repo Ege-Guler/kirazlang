@@ -54,8 +54,11 @@ class Identifier : public Node {
 public:
     Identifier(Token::Ptr);
 
+    virtual ~Identifier(){}
+
     std::string as_string() const override { return fmt::format("Id({})", m_value); }
 
+    std::string get_value() const { return m_value; }
 private:
     std::string m_value;
 };
