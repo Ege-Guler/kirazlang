@@ -71,8 +71,10 @@ stmt:
     ;
 
 classstmt:
-    KW_CLASS identifier OP_LBRACE class_list OP_RBRACE
-    { $$ = Node::add<ast::KwClass>($2, $4); }
+    KW_CLASS identifier OP_COLON identifier OP_LBRACE class_list OP_RBRACE
+    { $$ = Node::add<ast::KwClass>($2, $6, $4); }
+    | KW_CLASS identifier OP_LBRACE class_list OP_RBRACE
+    { $$ = Node::add<ast::KwClass>($2, $4, nullptr); }
     ;
 
 letstmt:
