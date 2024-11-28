@@ -124,6 +124,14 @@ public:
                            else_str);
     }
 
+    Ptr compute_stmt_type(SymbolTable &st) override{
+        set_cur_symtab(st.get_cur_symtab());
+        if (st.get_scope_type() == ScopeType::Module) {
+            return set_error("Misplaced if statement");
+        }
+        return nullptr;
+    }
+
 private:
     Node::Ptr m_condition;
     Node::Ptr m_then_block;
@@ -167,8 +175,6 @@ public:
     }
 
     Ptr compute_stmt_type(SymbolTable &st) override{
-        std::cout << "wihle";
-
         set_cur_symtab(st.get_cur_symtab());
         if (st.get_scope_type() == ScopeType::Module) {
             return set_error("Misplaced while statement");
@@ -192,6 +198,14 @@ public:
 
     std::string as_string() const override {
         return fmt::format("Return({})", m_value->as_string());
+    }
+
+    Ptr compute_stmt_type(SymbolTable &st) override{
+        set_cur_symtab(st.get_cur_symtab());
+        if (st.get_scope_type() == ScopeType::Module) {
+            return set_error("Misplaced return statement");
+        }
+        return nullptr;
     }
 
 private:

@@ -60,18 +60,15 @@ public:
         add_to_symtab_ordered(st);
 
     if (m_stmt_list) {
-        // Cast m_stmt_list to NodeList
         auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
         if (!node_list) {
             return set_error("Invalid NodeList in Module");
         }
 
-        // Traverse the NodeList
         for (const auto &node : node_list->get_nodes()) {
             if (node) {
-                // Call compute_stmt_type on each child node
                 if (auto error = node->compute_stmt_type(st)) {
-                    return error; // Propagate errors
+                    return error;
                 }
             }
         }
@@ -93,6 +90,7 @@ public:
         st.add_symbol("and", shared_from_this());
         st.add_symbol("or", shared_from_this());
         st.add_symbol("not", shared_from_this());
+        st.add_symbol("let", shared_from_this());
 
         return nullptr;
     }
