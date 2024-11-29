@@ -7,8 +7,8 @@
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
 #include <kiraz/ast/Misc.h>
-#include <vector>
 #include <set>
+#include <vector>
 
 namespace ast {
 
@@ -99,9 +99,9 @@ public:
 
         return nullptr;
     }
-    
+
     Ptr compute_stmt_type(SymbolTable &st) override {
-        
+
         if (auto ret = Node::compute_stmt_type(st)) {
             return ret;
         }
@@ -109,59 +109,77 @@ public:
         auto func_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         auto rtype_id = std::dynamic_pointer_cast<ast::Identifier>(m_rtype);
         auto arg_list = std::dynamic_pointer_cast<ast::ArgList>(m_args);
-        
-        if (!st.get_symbol(rtype_id->get_value())) {
+
+        if (! st.get_symbol(rtype_id->get_value())) {
             return set_error(fmt::format("Return type '{}' of function '{}' is not found",
-                                         rtype_id->get_value(), func_name->get_value()));
+                    rtype_id->get_value(), func_name->get_value()));
         }
+
+        // compute_stmnt_type for nodes and args
+        SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Func, shared_from_this());
 
         if (m_args && arg_list) {
             std::set<std::string> arg_names;
 
             for (const auto &[identifier, type] : arg_list->get_args()) {
-                
+
                 auto arg_name = std::dynamic_pointer_cast<ast::Identifier>(identifier);
-                
+
                 auto type_name = std::dynamic_pointer_cast<ast::Identifier>(type);
 
-                if (!arg_name) {
+                if (! arg_name) {
                     return set_error("Argument name is not a valid identifier");
                 }
 
-                if (!st.get_symbol(type_name->get_value())) {
+                if (! st.get_symbol(type_name->get_value())) {
                     return set_error(fmt::format("Identifier '{}' in type of argument '{}' in "
                                                  "function '{}' is not found",
-                                                 type_name->get_value(), arg_name->get_value(),
-                                                 func_name->get_value()));
+                            type_name->get_value(), arg_name->get_value(), func_name->get_value()));
                 }
 
-                if (!arg_names.insert(arg_name->get_value()).second) {
-                    return set_error(fmt::format("Identifier '{}' in argument list of function '{}' "
-                                                 "is already in symtab",
-                                                 arg_name->get_value(), func_name->get_value()));
+                if (! arg_names.insert(arg_name->get_value()).second) {
+                    return set_error(
+                            fmt::format("Identifier '{}' in argument list of function '{}' "
+                                        "is already in symtab",
+                                    arg_name->get_value(), func_name->get_value()));
                 }
 
                 if (arg_name->get_value() == func_name->get_value()) {
-                    return set_error(fmt::format("Identifier '{}' in argument list of function '{}' "
-                                                 "is already in symtab",
-                                                 arg_name->get_value(), func_name->get_value()));
+                    return set_error(
+                            fmt::format("Identifier '{}' in argument list of function '{}' "
+                                        "is already in symtab",
+                                    arg_name->get_value(), func_name->get_value()));
                 }
 
                 st.add_symbol(arg_name->get_value(), identifier);
             }
         }
 
+        // if there is a function body, compute its type
         if (m_scope) {
-            SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Func, shared_from_this());
-            auto ret = m_scope->compute_stmt_type(st);
-            if (ret) {
-                return ret;
+            auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_scope);
+            if (! node_list) {
+                return set_error("Invalid NodeList in Function");
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+
+                    if (! node->is_identifier()) {
+                        if (auto ret = node->add_to_symtab_forward(st)) {
+                            return ret;
+                        }
+                    }
+
+                    if (auto ret = node->compute_stmt_type(st)) {
+                        return ret;
+                    }
+                }
             }
         }
 
         return nullptr;
     }
-
 
 private:
     Node::Ptr m_name;
