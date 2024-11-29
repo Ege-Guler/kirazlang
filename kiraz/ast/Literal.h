@@ -9,6 +9,7 @@ namespace ast {
 
 class Bool : public Node {
 public:
+    Bool() : Node(L_BOOLEAN) {}
     Bool(Token::Ptr);
     std::string as_string() const override {
         return fmt::format("Bool({})", m_value ? "true" : "false");

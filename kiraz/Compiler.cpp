@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <fmt/format.h>
+#include <kiraz/ast/Builtin.h>
 #include <kiraz/ast/Literal.h>
 
 #include <resource/FILE_io_ki.h>
@@ -105,19 +106,29 @@ int Compiler::compile(Node::Ptr root, std::ostream &ostr) {
 SymbolTable::SymbolTable()
         : m_symbols({
                   std::make_shared<Scope>(
-                          Scope::SymTab{
-                                  {"func", std::make_shared<ast::Identifier>("func")},
+                          Scope::SymTab{{"func", std::make_shared<ast::Identifier>("func")},
                                   {"Boolean", std::make_shared<ast::Identifier>("Boolean")},
                                   {"Integer64", std::make_shared<ast::Identifier>("Integer64")},
                                   {"String", std::make_shared<ast::Identifier>("String")},
                                   {"void", std::make_shared<ast::Identifier>("void")},
-                                  {"Void",
-                                      std::make_shared<ast::Identifier>
-                                      ("Void")},
+                                  {"Void", std::make_shared<ast::Identifier>("Void")},
                                   {"class", std::make_shared<ast::Identifier>("class")},
                                   {"func", std::make_shared<ast::Identifier>("func")},
                                   {"func", std::make_shared<ast::Identifier>("func")},
-                          },
+                                  {"and",
+                                          std::make_shared<ast::LogicOp>("and",
+                                                  std::make_shared<ast::Bool>(),
+                                                  std::make_shared<ast::Bool>(),
+                                                  std::make_shared<ast::Bool>())},
+                                  {"or",
+                                          std::make_shared<ast::LogicOp>("and",
+                                                  std::make_shared<ast::Bool>(),
+                                                  std::make_shared<ast::Bool>(),
+                                                  std::make_shared<ast::Bool>())},
+                                  {"not",
+                                          std::make_shared<ast::LogicOp>("not",
+                                                  std::make_shared<ast::Bool>(),
+                                                  std::make_shared<ast::Bool>())}},
                           ScopeType::Module, nullptr),
           }) {
     if (! s_module_io) {
