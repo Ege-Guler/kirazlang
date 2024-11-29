@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include <fmt/format.h>
+#include <kiraz/ast/Literal.h>
 
 #include <resource/FILE_io_ki.h>
 
@@ -103,7 +104,18 @@ int Compiler::compile(Node::Ptr root, std::ostream &ostr) {
 
 SymbolTable::SymbolTable()
         : m_symbols({
-                  std::make_shared<Scope>(Scope::SymTab{}, ScopeType::Module, nullptr),
+                  std::make_shared<Scope>(
+                          Scope::SymTab{
+                                  {"func", std::make_shared<ast::Identifier>("func")},
+                                  {"Boolean", std::make_shared<ast::Identifier>("Boolean")},
+                                  {"Integer64", std::make_shared<ast::Identifier>("Integer64")},
+                                  {"String", std::make_shared<ast::Identifier>("String")},
+                                  {"void", std::make_shared<ast::Identifier>("void")},
+                                  {"class", std::make_shared<ast::Identifier>("class")},
+                                  {"func", std::make_shared<ast::Identifier>("func")},
+                                  {"func", std::make_shared<ast::Identifier>("func")},
+                          },
+                          ScopeType::Module, nullptr),
           }) {
     if (! s_module_io) {
         s_module_io = Compiler::current()->compile_module(FILE_io_ki);

@@ -83,5 +83,8 @@
         "strstream": "cpp",
         "regex": "cpp",
         "typeindex": "cpp"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
     }
 }
