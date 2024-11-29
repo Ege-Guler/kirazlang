@@ -50,6 +50,7 @@ public:
         return s_roots.back();
     }
 
+    virtual bool is_identifier() const { return false; }
     virtual bool is_func() const { return false; }
     virtual bool is_class() const { return false; }
     virtual bool is_funcarg_list() const { return false; }
@@ -137,7 +138,7 @@ public:
     auto get_col() const { return m_col; }
     const auto &get_error() const { return m_error; }
     auto get_id() const { return m_id; }
-    
+
     Node::Ptr set_error(const std::string &error) {
         m_error = error;
         return m_error.empty() ? nullptr : shared_from_this();

@@ -164,8 +164,11 @@ public:
 
             for (const auto &node : node_list->get_nodes()) {
                 if (node) {
-                    if (auto ret = node->add_to_symtab_forward(st)) {
-                        return ret;
+
+                    if (! node->is_identifier()) {
+                        if (auto ret = node->add_to_symtab_forward(st)) {
+                            return ret;
+                        }
                     }
 
                     if (auto ret = node->compute_stmt_type(st)) {
