@@ -111,6 +111,9 @@ SymbolTable::SymbolTable()
                                   {"Integer64", std::make_shared<ast::Identifier>("Integer64")},
                                   {"String", std::make_shared<ast::Identifier>("String")},
                                   {"void", std::make_shared<ast::Identifier>("void")},
+                                  {"Void",
+                                      std::make_shared<ast::Identifier>
+                                      ("Void")},
                                   {"class", std::make_shared<ast::Identifier>("class")},
                                   {"func", std::make_shared<ast::Identifier>("func")},
                                   {"func", std::make_shared<ast::Identifier>("func")},
