@@ -5,13 +5,13 @@
 
 namespace token {
 
-class Bool : public Token{
+class Bool : public Token {
 
 public:
-    Bool(bool value) : Token(L_BOOLEAN), m_value(value){}
+    Bool(bool value) : Token(L_BOOLEAN), m_value(value) {}
     virtual ~Bool();
 
-    std::string as_string() const override{return fmt::format("Boolean{}", m_value); }
+    std::string as_string() const override { return fmt::format("Boolean{}", m_value); }
     void print() { fmt::print("{}\n", as_string()); }
 
     static int colno;
@@ -21,7 +21,6 @@ public:
 private:
     bool m_value;
 };
-
 
 class Integer : public Token {
 public:
@@ -51,33 +50,33 @@ public:
         for (size_t i = 0; i < value.length(); ++i) {
             if (value[i] == '\\' && i + 1 < value.length()) {
                 switch (value[i + 1]) {
-                    case 'n':
-                        value.replace(i, 2, "\n");
-                        break;
-                    case 't':
-                        value.replace(i, 2, "\t");
-                        break;
-                    case 'r':
-                        value.replace(i, 2, "\r");
-                        break;
-                    case 'b':
-                        value.replace(i, 2, "\b");
-                        break;
-                    case 'f':
-                        value.replace(i, 2, "\f");
-                        break;
-                    case '\\':
-                        value.replace(i, 2, "\\");
-                        break;
-                    case '"':
-                        value.replace(i, 2, "\"");
-                        break;
-                    default:
-                        continue;
+                case 'n':
+                    value.replace(i, 2, "\n");
+                    break;
+                case 't':
+                    value.replace(i, 2, "\t");
+                    break;
+                case 'r':
+                    value.replace(i, 2, "\r");
+                    break;
+                case 'b':
+                    value.replace(i, 2, "\b");
+                    break;
+                case 'f':
+                    value.replace(i, 2, "\f");
+                    break;
+                case '\\':
+                    value.replace(i, 2, "\\");
+                    break;
+                case '"':
+                    value.replace(i, 2, "\"");
+                    break;
+                default:
+                    continue;
                 }
             }
         }
-        
+
         value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
         m_value = value;
     }
@@ -90,10 +89,10 @@ public:
     static int colno;
 
     auto get_value() const { return m_value; }
-private : 
+
+private:
     int m_id;
     std::string m_value;
-
 };
 
 class Identifier : public Token {

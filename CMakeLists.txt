@@ -132,6 +132,9 @@ add_library(kiraz STATIC
     kiraz/ast/Literal.h
     kiraz/ast/Literal.cpp
 
+    kiraz/ast/Builtin.h
+    kiraz/ast/Builtin.cpp
+
     ${BISON_PARSER_OUTPUTS}
     ${FLEX_LEXER_OUTPUTS}
 
