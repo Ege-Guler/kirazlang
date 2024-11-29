@@ -56,21 +56,35 @@ public:
 
             auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
 
+            m_symtab = std::make_unique<SymbolTable>(ScopeType::Module);
+
             if (! node_list) {
                 return set_error("Invalid NodeList in Module");
             }
 
             for (const auto &node : node_list->get_nodes()) {
                 if (node) {
-                    if (auto error = node->compute_stmt_type(st)) {
-                        return error;
+                    if (auto ret = node->add_to_symtab_forward(st)) {
+                        return ret;
                     }
 
+                    if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
+                        return ret;
+                    }
+                }
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
                     if (auto ret = node->add_to_symtab_ordered(st)) {
                         return ret;
                     }
 
-                    if (auto ret = node->add_to_symtab_forward(st)) {
+                    if (auto ret = node->add_to_symtab_ordered(*m_symtab)) {
+                        return ret;
+                    }
+
+                    if (auto ret = node->compute_stmt_type(st)) {
                         return ret;
                     }
                 }
@@ -81,6 +95,7 @@ public:
 
 private:
     Node::Ptr m_stmt_list;
+    std::unique_ptr<SymbolTable> m_symtab;
 };
 
 class ArgList : public Node {

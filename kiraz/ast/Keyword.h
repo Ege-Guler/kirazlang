@@ -80,28 +80,30 @@ public:
     }
 
     Ptr add_to_symtab_forward(SymbolTable &st) override {
-        auto func_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
 
-        if (get_symbol(st)) {
-            std::cout << "dfsdfsdfsdfsdf\n\n" << get_symbol(st) << std::endl;
+        auto func_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+        if (st.get_symbol(func_name->get_value())) {
             return set_error(
                     fmt::format("Identifier '{}' is already in symtab", func_name->get_value()));
         }
-        if (std::islower(func_name->get_value()[0])) {
-            return set_error(
-                    fmt::format("Function name '{}' can not start with an lowercase letter",
-                            func_name->get_value()));
-        }
 
+        // Use it for KwClass
+
+        // if (std::islower(func_name->get_value()[0])) {
+        //     return set_error(
+        //             fmt::format("Function name '{}' can not start with an lowercase letter",
+        //                     func_name->get_value()));
+        // }
         st.add_symbol(func_name->get_value(), shared_from_this());
 
         return nullptr;
     }
 
     Ptr compute_stmt_type(SymbolTable &st) override {
-        add_to_symtab_forward(st);
-        set_cur_symtab(st.get_cur_symtab());
 
+        if (auto ret = Node::compute_stmt_type(st)) {
+            return ret;
+        }
         auto rtype_id = std::dynamic_pointer_cast<ast::Identifier>(m_rtype);
         auto func_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         auto arg_list = std::dynamic_pointer_cast<ast::ArgList>(m_args);
@@ -111,38 +113,40 @@ public:
                     rtype_id->get_value(), func_name->get_value()));
         }
 
-        if (m_args) {
-            for (const auto &[identifier, type] : arg_list->get_args()) {
-                auto arg_name = std::dynamic_pointer_cast<ast::Identifier>(identifier);
-                auto type_name = std::dynamic_pointer_cast<ast::Identifier>(type);
+        // !TODO arglist and nodelist
 
-                auto a = st.get_symbol("class");
+        // if (m_args) {
+        //     for (const auto &[identifier, type] : arg_list->get_args()) {
+        //         auto arg_name = std::dynamic_pointer_cast<ast::Identifier>(identifier);
+        //         auto type_name = std::dynamic_pointer_cast<ast::Identifier>(type);
 
-                if (! arg_name) {
-                    return set_error("Argument name is not a valid identifier");
-                }
+        //         auto a = st.get_symbol("class");
 
-                if (! st.get_symbol(type_name->get_value())) {
+        //         if (! arg_name) {
+        //             return set_error("Argument name is not a valid identifier");
+        //         }
 
-                    return set_error(fmt::format("Identifier '{}' in type of argument '{}' in "
-                                                 "function '{}' is not found",
-                            type_name->get_value(), arg_name->get_value(), func_name->get_value()));
-                }
+        //         if (! st.get_symbol(type_name->get_value())) {
 
-                if (! st.add_symbol(arg_name->get_value(), identifier)) {
-                    return set_error(fmt::format(
-                            "Argument '{}' is already in symtab", arg_name->get_value()));
-                }
-            }
-        }
+        //             return set_error(fmt::format("Identifier '{}' in type of argument '{}' in "
+        //                                          "function '{}' is not found",
+        //                     type_name->get_value(), arg_name->get_value(),
+        //                     func_name->get_value()));
+        //         }
 
-        if (m_scope) {
-            SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Func, shared_from_this());
-            auto ret = m_scope->compute_stmt_type(st);
-            if (ret) {
-                return ret;
-            }
-        }
+        //         if (! st.add_symbol(arg_name->get_value(), identifier)) {
+        //             return set_error(fmt::format(
+        //                     "Argument '{}' is already in symtab", arg_name->get_value()));
+        //         }
+        //     }
+        // }
+
+        // if (m_scope) {
+        //     SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Func,
+        //     shared_from_this()); auto ret = m_scope->compute_stmt_type(st); if (ret) {
+        //         return ret;
+        //     }
+        // }
 
         return nullptr;
     }
@@ -229,7 +233,6 @@ public:
     }
 
     Ptr compute_stmt_type(SymbolTable &st) override {
-        set_cur_symtab(st.get_cur_symtab());
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         if (std::islower(iden->get_value()[0])) {
