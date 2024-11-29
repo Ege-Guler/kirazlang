@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUILTIN_H_
+#define BUILTIN_H_
 
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
@@ -37,3 +38,5 @@ private:
 };
 
 }
+
+#endif // BUILTIN_H_
