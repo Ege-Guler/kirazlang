@@ -29,8 +29,8 @@ public:
                 m_op_name == "not" ? "" : m_lhs->as_string(), m_rhs->as_string(),
                 m_rtype->as_string());
     }
-    
-    std::string get_type() const override { return "Boolean"; }
+
+    std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
 private:
     std::string m_op_name;

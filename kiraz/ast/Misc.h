@@ -5,6 +5,7 @@
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
 #include <vector>
+
 namespace ast {
 
 class NodeList : public Node {
@@ -173,6 +174,34 @@ public:
     std::string as_string() const override {
         return fmt::format(
                 "Call(n={}, a={})", m_callee->as_string(), m_args ? m_args->as_string() : "[]");
+    }
+
+    //! TODO
+    // Ptr compute_stmt_type(SymbolTable &st) override {
+    //     if (auto ret = Node::compute_stmt_type(st)) {
+    //         return ret;
+    //     }
+
+    //     auto callee = std::dynamic_pointer_cast<ast::Identifier>(m_callee);
+
+    //     auto func_entry = st.get_symbol(callee->get_value());
+
+    //     if (! func_entry) {
+    //         return set_error(fmt::format("Identifier '{}' is not found", callee->get_value()));
+    //     }
+
+    //     return nullptr;
+    // }
+
+    std::string get_type(SymbolTable &st) const override {
+
+        auto callee = std::dynamic_pointer_cast<ast::Identifier>(m_callee);
+
+        auto func_entry = st.get_symbol(callee->get_value());
+
+        auto func_ptr = func_entry.stmt;
+
+        return func_ptr->get_type(st);
     }
 
 private:

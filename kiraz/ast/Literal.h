@@ -15,7 +15,7 @@ public:
         return fmt::format("Bool({})", m_value ? "true" : "false");
     }
 
-    std::string get_type() const override { return "Boolean"; }
+    std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
 private:
     int64_t m_value;
@@ -27,7 +27,7 @@ public:
 
     std::string as_string() const override { return fmt::format("Int({})", m_value); }
 
-    std::string get_type() const override { return "Integer64"; }
+    std::string get_type(SymbolTable &st) const override { return "Integer64"; }
 
 private:
     int64_t m_value;
@@ -40,7 +40,7 @@ public:
 
     std::string as_string() const override { return fmt::format("Str({})", m_value); }
 
-    std::string get_type() const override { return "String"; }
+    std::string get_type(SymbolTable &st) const override { return "String"; }
 
 private:
     std::string m_value;
@@ -74,7 +74,7 @@ public:
 
     std::string get_value() const { return m_value; }
 
-    std::string get_type() const override { return "Identifier"; }
+    std::string get_type(SymbolTable &st) const override { return "Identifier"; }
 
     Node::Ptr add_to_symtab_forward(SymbolTable &st) override {
         st.add_symbol(m_value, shared_from_this());
