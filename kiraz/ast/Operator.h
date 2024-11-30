@@ -97,26 +97,36 @@ public:
 class OpEq : public OpBinary {
 public:
     OpEq(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_EQ, left, right) {}
+    
+    std::string get_type() const override { return "Boolean"; }
 };
 
 class OpGt : public OpBinary {
 public:
     OpGt(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_GT, left, right) {}
+    
+    std::string get_type() const override { return "Boolean"; }
 };
 
 class OpGe : public OpBinary {
 public:
     OpGe(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_GE, left, right) {}
+    
+    std::string get_type() const override { return "Boolean"; }
 };
 
 class OpLt : public OpBinary {
 public:
     OpLt(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_LT, left, right) {}
+    
+    std::string get_type() const override { return "Boolean"; }
 };
 
 class OpLe : public OpBinary {
 public:
     OpLe(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_LE, left, right) {}
+    
+    std::string get_type() const override { return "Boolean"; }
 };
 
 class OpDot : public OpBinary {

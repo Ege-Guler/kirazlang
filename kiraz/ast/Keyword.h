@@ -266,9 +266,35 @@ public:
 
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
-        if (st.get_scope_type() == ScopeType::Module) {
+
+
+        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced if statement");
         }
+
+    
+        if (m_condition) {
+    
+            if (auto type = m_condition->get_type(); type != "Boolean") {
+                return set_error("If only accepts tests of type 'Boolean'");
+            }
+        } else {
+            return set_error("Condition is missing");
+        }
+
+
+        if (m_then_block) {
+            if (auto ret = m_then_block->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        if (m_else_block) {
+            if (auto ret = m_else_block->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
         return nullptr;
     }
 
