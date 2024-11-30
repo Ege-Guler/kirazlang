@@ -30,7 +30,13 @@ public:
         return fmt::format("Let(n={}, t={}, i={})", m_identifier->as_string(), m_type->as_string(),
                 m_initial_val->as_string());
     }
-    
+
+    // add_to_symtab_ordered
+    // call add_to_symtab_ordered for identifier
+    // type check ??
+
+    // compute_stmt_type
+
     Node::Ptr get_identifier() const { return m_identifier; }
     Node::Ptr get_type() const { return m_type; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
@@ -184,7 +190,7 @@ public:
 
         return nullptr;
     }
-    
+
     Node::Ptr get_name() const { return m_name; }
     Node::Ptr get_args() const { return m_args; }
     Node::Ptr get_rtype() const { return m_rtype; }
@@ -206,9 +212,9 @@ public:
     std::string as_string() const override {
         return fmt::format("Import({})", m_identifier->as_string());
     }
-    
+
     Node::Ptr get_identifier() const { return m_identifier; }
-    
+
 private:
     Node::Ptr m_identifier;
 };
@@ -245,7 +251,7 @@ public:
         }
         return nullptr;
     }
-    
+
     Node::Ptr get_condition() const { return m_condition; }
     Node::Ptr get_then_block() const { return m_then_block; }
     Node::Ptr get_else_block() const { return m_else_block; }
@@ -296,11 +302,11 @@ public:
 
         return nullptr;
     }
-    
+
     Node::Ptr get_name() const { return m_name; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
     Node::Ptr get_base_name() const { return m_base_name; }
-    
+
 private:
     Node::Ptr m_name;
     Node::Ptr m_stmt_list;
@@ -327,10 +333,10 @@ public:
 
         return nullptr;
     }
-    
+
     Node::Ptr get_condition() const { return m_condition; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
-    
+
 private:
     Node::Ptr m_condition;
     Node::Ptr m_stmt_list;
@@ -353,6 +359,7 @@ public:
     }
 
     Node::Ptr get_value() const { return m_value; }
+
 private:
     Node::Ptr m_value;
 };
