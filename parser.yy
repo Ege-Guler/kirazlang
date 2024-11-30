@@ -89,7 +89,11 @@ letstmt:
     ;
 
 assignmentstmt:
-    identifier OP_ASSIGN expr
+    builtin_func OP_ASSIGN builtin_func
+    {
+        $$ = Node::add<ast::OpAssign>($1, $3);
+    }
+    | identifier OP_ASSIGN expr
     {
         if (!$3) {
             $$ = nullptr;
@@ -97,6 +101,8 @@ assignmentstmt:
             $$ = Node::add<ast::OpAssign>($1, $3);
         }
     }
+
+
     ;
 
 importstmt:
@@ -220,6 +226,18 @@ logic_expr:
     | OP_NOT OP_LPAREN expr OP_RPAREN {
           $$ = Node::add<ast::OpNot>($3);
       }
+    ;
+
+builtin_func:
+    OP_AND {
+        $$ = Node::add<ast::Identifier>("and");
+    }
+    | OP_OR {
+        $$ = Node::add<ast::Identifier>("or");
+    }
+    | OP_NOT {
+        $$ = Node::add<ast::Identifier>("not");
+    }
     ;
 
     
