@@ -53,11 +53,19 @@ public:
             }
         }
 
+        auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+
+        if (m_type && m_initial_val) {
+            if (let_type->get_value() != m_initial_val->get_type()) {
+                return set_error(
+                        fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
+                                m_initial_val->get_type(), let_type->get_value()));
+            }
+        }
         return nullptr;
     }
 
     Node::Ptr get_identifier() const { return m_identifier; }
-    Node::Ptr get_type() const { return m_type; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
 
 private:
@@ -258,9 +266,35 @@ public:
 
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
-        if (st.get_scope_type() == ScopeType::Module) {
+
+
+        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced if statement");
         }
+
+    
+        if (m_condition) {
+    
+            if (auto type = m_condition->get_type(); type != "Boolean") {
+                return set_error("If only accepts tests of type 'Boolean'");
+            }
+        } else {
+            return set_error("Condition is missing");
+        }
+
+
+        if (m_then_block) {
+            if (auto ret = m_then_block->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        if (m_else_block) {
+            if (auto ret = m_else_block->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
         return nullptr;
     }
 
