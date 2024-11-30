@@ -138,7 +138,7 @@ class OpAnd : public OpBinary {
 public:
     OpAnd(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_AND, left, right) {}
 
-    std::string get_type() const override { return "Boolean"; }
+    std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
     std::string as_string() const override {
         return fmt::format("And(l={}, r={})", get_left()->as_string(), get_right()->as_string());
@@ -149,7 +149,7 @@ class OpOr : public OpBinary {
 public:
     OpOr(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_OR, left, right) {}
 
-    std::string get_type() const override { return "Boolean"; }
+    std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
     std::string as_string() const override {
         return fmt::format("Or(l={}, r={})", get_left()->as_string(), get_right()->as_string());
@@ -162,7 +162,7 @@ public:
         assert(operand);
     }
 
-    std::string get_type() const override { return "Boolean"; }
+    std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
     std::string as_string() const override {
         return fmt::format("Not(operand={})", m_operand->as_string());
