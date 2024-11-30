@@ -34,8 +34,13 @@ extern int yylineno;
 
 %token L_INTEGER L_STRING L_BOOLEAN
 
+%token OP_AND OP_OR OP_NOT
+
+
 %left OP_PLUS OP_MINUS
 %left OP_MULT OP_DIVF
+
+
 
 %nonassoc OP_EQ OP_GT OP_GE OP_LT OP_LE
 %precedence OP_LPAREN
@@ -139,7 +144,8 @@ returnstmt:
     ;
 
 expr:
-    comp_expr
+    logic_expr
+    | comp_expr
     ;
 
 comp_expr:
@@ -203,6 +209,20 @@ literal:
 bool :
     L_BOOLEAN { $$ = Node::add<ast::Bool>(curtoken); }
     ;
+    
+logic_expr:
+      OP_AND OP_LPAREN expr OP_COMMA expr OP_RPAREN {
+          $$ = Node::add<ast::OpAnd>($3, $5);
+      }
+    | OP_OR OP_LPAREN expr OP_COMMA expr OP_RPAREN {
+          $$ = Node::add<ast::OpOr>($3, $5);
+      }
+    | OP_NOT OP_LPAREN expr OP_RPAREN {
+          $$ = Node::add<ast::OpNot>($3);
+      }
+    ;
+
+    
 identifier:
     IDENTIFIER { $$ = Node::add<ast::Identifier>(curtoken); }
     ;

@@ -134,6 +134,46 @@ public:
     OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
 };
 
+class OpAnd : public OpBinary {
+public:
+    OpAnd(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_AND, left, right) {}
+
+    std::string get_type() const override { return "Boolean"; }
+
+    std::string as_string() const override {
+        return fmt::format("And(l={}, r={})", get_left()->as_string(), get_right()->as_string());
+    }
+};
+
+class OpOr : public OpBinary {
+public:
+    OpOr(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_OR, left, right) {}
+
+    std::string get_type() const override { return "Boolean"; }
+
+    std::string as_string() const override {
+        return fmt::format("Or(l={}, r={})", get_left()->as_string(), get_right()->as_string());
+    }
+};
+
+class OpNot : public Node {
+public:
+    explicit OpNot(const Node::Ptr &operand) : Node(OP_NOT), m_operand(operand) {
+        assert(operand);
+    }
+
+    std::string get_type() const override { return "Boolean"; }
+
+    std::string as_string() const override {
+        return fmt::format("Not(operand={})", m_operand->as_string());
+    }
+
+    Node::Ptr get_operand() const { return m_operand; }
+
+private:
+    Node::Ptr m_operand;
+};
+
 }
 
 #endif // KIRAZ_AST_OPERATOR_H
