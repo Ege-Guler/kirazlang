@@ -30,13 +30,32 @@ public:
         return fmt::format("Let(n={}, t={}, i={})", m_identifier->as_string(), m_type->as_string(),
                 m_initial_val->as_string());
     }
+    
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        
+            set_cur_symtab(st.get_cur_symtab());
 
-    // add_to_symtab_ordered
-    // call add_to_symtab_ordered for identifier
-    // type check ??
+            if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+                return ret;
+            }
 
-    // compute_stmt_type
+            if (m_initial_val) {
+                if (auto ret = m_initial_val->compute_stmt_type(st)) {
+                    return ret;
+                }
+            }
 
+            if (m_type) {
+                auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+                if (!type_name || !st.get_symbol(type_name->get_value())) {
+                    return set_error(fmt::format("Type '{}' not found for let statement",
+                                                 m_type->as_string()));
+                }
+            }
+
+            return nullptr;
+        }
+    
     Node::Ptr get_identifier() const { return m_identifier; }
     Node::Ptr get_type() const { return m_type; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
