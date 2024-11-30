@@ -56,10 +56,10 @@ public:
         auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
 
         if (m_type && m_initial_val) {
-            if (let_type->get_value() != m_initial_val->get_type()) {
+            if (let_type->get_value() != m_initial_val->get_type(st)) {
                 return set_error(
                         fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
-                                m_initial_val->get_type(), let_type->get_value()));
+                                m_initial_val->get_type(st), let_type->get_value()));
             }
         }
         return nullptr;
@@ -115,6 +115,11 @@ public:
         }
 
         return result;
+    }
+
+    std::string get_type(SymbolTable &st) const override {
+        auto rtype = std::dynamic_pointer_cast<ast::Identifier>(m_rtype);
+        return rtype->get_value();
     }
 
     Ptr add_to_symtab_forward(SymbolTable &st) override {
@@ -267,21 +272,19 @@ public:
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
 
-
         if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced if statement");
         }
 
-    
         if (m_condition) {
-    
-            if (auto type = m_condition->get_type(); type != "Boolean") {
+
+            if (auto type = m_condition->get_type(st); type != "Boolean") {
                 return set_error("If only accepts tests of type 'Boolean'");
             }
-        } else {
+        }
+        else {
             return set_error("Condition is missing");
         }
-
 
         if (m_then_block) {
             if (auto ret = m_then_block->compute_stmt_type(st)) {
