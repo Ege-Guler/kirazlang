@@ -98,13 +98,6 @@ public:
                     fmt::format("Identifier '{}' is already in symtab", func_name->get_value()));
         }
 
-        // Use it for KwClass
-
-        // if (std::islower(func_name->get_value()[0])) {
-        //     return set_error(
-        //             fmt::format("Function name '{}' can not start with an lowercase letter",
-        //                     func_name->get_value()));
-        // }
         st.add_symbol(func_name->get_value(), shared_from_this());
 
         return nullptr;
@@ -283,7 +276,25 @@ public:
         }
     }
 
+    bool is_class() const override { return true; }
+
+    Ptr add_to_symtab_forward(SymbolTable &st) override {
+
+        auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+        if (st.get_symbol(iden->get_value())) {
+            return set_error(
+                    fmt::format("Identifier '{}' is already in symtab", iden->get_value()));
+        }
+
+        st.add_symbol(iden->get_value(), shared_from_this());
+
+        return nullptr;
+    }
+
     Ptr compute_stmt_type(SymbolTable &st) override {
+        if (auto ret = Node::compute_stmt_type(st)) {
+            return ret;
+        }
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         if (std::islower(iden->get_value()[0])) {
@@ -300,8 +311,48 @@ public:
             }
         }
 
+        auto class_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+        auto base_name = std::dynamic_pointer_cast<ast::Identifier>(m_base_name);
+
+        SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Class, shared_from_this());
+
+        if (get_stmt_list()) {
+
+            auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
+            if (! node_list) {
+                return set_error("Invalid NodeList in Class");
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+                    if (! node->is_identifier()) {
+                        if (auto ret = node->add_to_symtab_forward(st)) {
+                            return ret;
+                        }
+                    }
+
+                    if (auto ret = node->compute_stmt_type(st)) {
+                        return ret;
+                    }
+                }
+            }
+        }
+
         return nullptr;
     }
+
+    // !TODO
+    // SymTabEntry get_subsymbol(const std::string &name) const override {
+    //     if (auto ret = Node::get_subsymbol(name)) {
+    //         return ret;
+    //     }
+
+    //     if (m_symtab) {
+    //         return m_symtab->get_symbol(name);
+    //     }
+
+    //     return {};
+    // }
 
     Node::Ptr get_name() const { return m_name; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
