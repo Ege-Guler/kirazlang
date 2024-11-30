@@ -440,7 +440,7 @@ public:
 
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
-        if (st.get_scope_type() == ScopeType::Module) {
+        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced while statement");
         }
 
@@ -465,7 +465,7 @@ public:
 
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
-        if (st.get_scope_type() == ScopeType::Module) {
+        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced return statement");
         }
         return nullptr;
