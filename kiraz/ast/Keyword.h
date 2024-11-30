@@ -53,11 +53,19 @@ public:
             }
         }
 
+        auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+
+        if (m_type && m_initial_val) {
+            if (let_type->get_value() != m_initial_val->get_type()) {
+                return set_error(
+                        fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
+                                m_initial_val->get_type(), let_type->get_value()));
+            }
+        }
         return nullptr;
     }
 
     Node::Ptr get_identifier() const { return m_identifier; }
-    Node::Ptr get_type() const { return m_type; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
 
 private:
