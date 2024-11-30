@@ -30,32 +30,32 @@ public:
         return fmt::format("Let(n={}, t={}, i={})", m_identifier->as_string(), m_type->as_string(),
                 m_initial_val->as_string());
     }
-    
-    Ptr compute_stmt_type(SymbolTable &st) override {
-        
-            set_cur_symtab(st.get_cur_symtab());
 
-            if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+    Ptr compute_stmt_type(SymbolTable &st) override {
+
+        set_cur_symtab(st.get_cur_symtab());
+
+        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+            return ret;
+        }
+
+        if (m_initial_val) {
+            if (auto ret = m_initial_val->compute_stmt_type(st)) {
                 return ret;
             }
-
-            if (m_initial_val) {
-                if (auto ret = m_initial_val->compute_stmt_type(st)) {
-                    return ret;
-                }
-            }
-
-            if (m_type) {
-                auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
-                if (!type_name || !st.get_symbol(type_name->get_value())) {
-                    return set_error(fmt::format("Type '{}' not found for let statement",
-                                                 m_type->as_string()));
-                }
-            }
-
-            return nullptr;
         }
-    
+
+        if (m_type) {
+            auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+            if (! type_name || ! st.get_symbol(type_name->get_value())) {
+                return set_error(
+                        fmt::format("Type '{}' not found for let statement", m_type->as_string()));
+            }
+        }
+
+        return nullptr;
+    }
+
     Node::Ptr get_identifier() const { return m_identifier; }
     Node::Ptr get_type() const { return m_type; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
@@ -332,6 +332,12 @@ public:
 
         auto class_name = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         auto base_name = std::dynamic_pointer_cast<ast::Identifier>(m_base_name);
+
+        if (base_name) {
+            if (! st.get_symbol(base_name->get_value())) {
+                return set_error(fmt::format("Type '{}' is not found", base_name->get_value()));
+            }
+        }
 
         SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Class, shared_from_this());
 
