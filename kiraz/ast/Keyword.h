@@ -35,7 +35,7 @@ public:
 
         set_cur_symtab(st.get_cur_symtab());
 
-        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+        if (auto ret = m_identifier->add_to_symtab_forward(st)) {
             return ret;
         }
         if (m_initial_val) {

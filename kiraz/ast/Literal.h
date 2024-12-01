@@ -82,11 +82,17 @@ public:
     }
 
     Node::Ptr add_to_symtab_forward(SymbolTable &st) override {
+        if (st.get_symbol(m_value)) {
+            return set_error(fmt::format("Identifier '{}' is already in symtab", m_value));
+        }
         st.add_symbol(m_value, shared_from_this());
         return nullptr;
     }
 
     Node::Ptr add_to_symtab_ordered(SymbolTable &st) override {
+        if (st.get_symbol(m_value)) {
+            return set_error(fmt::format("Identifier '{}' is already in symtab", m_value));
+        }
         st.add_symbol(m_value, shared_from_this());
         return nullptr;
     }
