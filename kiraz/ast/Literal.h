@@ -74,7 +74,12 @@ public:
 
     std::string get_value() const { return m_value; }
 
-    std::string get_type(SymbolTable &st) const override { return "Identifier"; }
+    std::string get_type(SymbolTable &st) const override {
+        if (! m_type.empty()) {
+            return m_type;
+        }
+        return "Identifier";
+    }
 
     Node::Ptr add_to_symtab_forward(SymbolTable &st) override {
         st.add_symbol(m_value, shared_from_this());
@@ -87,6 +92,7 @@ public:
     }
 
     Node::Ptr compute_stmt_type(SymbolTable &st) override {
+        set_cur_symtab(st.get_cur_symtab());
 
         if (! st.get_symbol(m_value)) {
 
@@ -96,8 +102,15 @@ public:
         return nullptr;
     }
 
+    void set_type(Node::Ptr type) {
+        auto type_node = std::dynamic_pointer_cast<ast::Identifier>(type);
+        m_type = type_node->get_value();
+    }
+    void set_type(std::string type) { m_type = type; }
+
 private:
     std::string m_value;
+    std::string m_type;
 };
 
 }
