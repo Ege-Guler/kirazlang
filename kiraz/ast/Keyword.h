@@ -38,7 +38,6 @@ public:
         if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
-
         if (m_initial_val) {
             if (auto ret = m_initial_val->compute_stmt_type(st)) {
                 return ret;
@@ -53,6 +52,16 @@ public:
             }
         }
 
+        auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_identifier);
+
+        if (m_type) {
+
+            iden->set_type(m_type);
+        }
+        else if (! m_type) {
+            iden->set_type(m_initial_val->get_type(st));
+        }
+
         auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
 
         if (m_type && m_initial_val) {
@@ -64,6 +73,14 @@ public:
         }
         return nullptr;
     }
+
+    // std::string get_type(SymbolTable &st) const override {
+    //     if (m_type) {
+    //         auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+    //         return type_name->get_value();
+    //     }
+    //     return m_initial_val->get_type(st);
+    // }
 
     Node::Ptr get_identifier() const { return m_identifier; }
     Node::Ptr get_initial_val() const { return m_initial_val; }

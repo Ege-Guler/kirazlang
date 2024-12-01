@@ -4,7 +4,10 @@
 #include <cassert>
 
 #include <iostream>
+#include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
+#include <kiraz/ast/Literal.h>
+
 namespace ast {
 class OpBinary : public Node {
 protected:
@@ -92,6 +95,37 @@ public:
 class OpAssign : public OpBinary {
 public:
     OpAssign(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_ASSIGN, left, right) {}
+
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        set_cur_symtab(st.get_cur_symtab());
+
+        auto r = get_right();
+        auto l = get_left();
+
+        if (r) {
+            if (auto ret = r->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+        if (l) {
+            if (auto ret = l->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
+        auto l_node = st.get_symbol(l_iden->get_value());
+
+        if (l_node) {
+            if (r->get_type(st) != (l_node.stmt)->get_type(st)) {
+                return set_error(fmt::format(
+                        "Left type '{}' of assignment does not match the right type '{}'",
+                        (l_node.stmt)->get_type(st), r->get_type(st)));
+            }
+        }
+
+        return nullptr;
+    }
 };
 
 class OpEq : public OpBinary {
@@ -158,9 +192,7 @@ public:
 
 class OpNot : public Node {
 public:
-    explicit OpNot(const Node::Ptr &operand) : Node(OP_NOT), m_operand(operand) {
-        assert(operand);
-    }
+    explicit OpNot(const Node::Ptr &operand) : Node(OP_NOT), m_operand(operand) { assert(operand); }
 
     std::string get_type(SymbolTable &st) const override { return "Boolean"; }
 
