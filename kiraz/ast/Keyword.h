@@ -34,7 +34,7 @@ public:
     Ptr compute_stmt_type(SymbolTable &st) override {
 
         set_cur_symtab(st.get_cur_symtab());
-
+        
         if (auto ret = m_identifier->add_to_symtab_forward(st)) {
             return ret;
         }
@@ -53,7 +53,11 @@ public:
         }
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_identifier);
-
+        
+        if (iden && std::isupper(iden->get_value()[0])) {
+            return set_error(
+                fmt::format("Variable name '{}' can not start with an uppercase letter", iden->get_value()));
+        }
         if (m_type) {
 
             iden->set_type(m_type);
@@ -372,7 +376,7 @@ public:
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
         if (std::islower(iden->get_value()[0])) {
             return set_error(fmt::format(
-                    "Class name '{}' cannot start with a lowercase letter", iden->get_value()));
+                    "Class name '{}' can not start with an lowercase letter", iden->get_value()));
         }
 
         if (m_base_name) {
