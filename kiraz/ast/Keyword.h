@@ -465,9 +465,22 @@ public:
 
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
+
         if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
             return set_error("Misplaced return statement");
         }
+
+        auto func = st.get_scope_stmt();
+        if (func) {
+            auto func_type = func->get_type(st);
+
+            if (func_type != m_value->get_type(st)) {
+                return set_error(fmt::format(
+                        "Return statement type '{}' does not match function return type '{}'",
+                        m_value->get_type(st), func_type));
+            }
+        }
+
         return nullptr;
     }
 
