@@ -456,13 +456,29 @@ public:
     }
 
     Ptr compute_stmt_type(SymbolTable &st) override {
-        set_cur_symtab(st.get_cur_symtab());
-        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
-            return set_error("Misplaced while statement");
-        }
+            set_cur_symtab(st.get_cur_symtab());
 
-        return nullptr;
-    }
+            if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
+                return set_error("Misplaced while statement");
+            }
+
+            if (m_condition) {
+                auto condition_type = m_condition->get_type(st);
+                if (condition_type != "Boolean") {
+                    return set_error("While only accepts tests of type 'Boolean'");
+                }
+            } else {
+                return set_error("Condition is missing in while statement");
+            }
+
+            if (m_stmt_list) {
+                if (auto ret = m_stmt_list->compute_stmt_type(st)) {
+                    return ret;
+                }
+            }
+
+            return nullptr;
+        }
 
     Node::Ptr get_condition() const { return m_condition; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
