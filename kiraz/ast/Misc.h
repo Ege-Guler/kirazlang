@@ -149,6 +149,8 @@ public:
         }
     }
 
+    const std::vector<Node::Ptr> &get_args() const { return m_args; }
+
     std::string as_string() const override {
         std::string result = "FuncArgs([";
         for (size_t i = 0; i < m_args.size(); ++i) {
@@ -176,22 +178,29 @@ public:
                 "Call(n={}, a={})", m_callee->as_string(), m_args ? m_args->as_string() : "[]");
     }
 
-    //! TODO
-    // Ptr compute_stmt_type(SymbolTable &st) override {
-    //     if (auto ret = Node::compute_stmt_type(st)) {
-    //         return ret;
-    //     }
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        Node::compute_stmt_type(st);
 
-    //     auto callee = std::dynamic_pointer_cast<ast::Identifier>(m_callee);
+        if (m_callee) {
+            if (auto ret = m_callee->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
 
-    //     auto func_entry = st.get_symbol(callee->get_value());
+        if (m_args) {
+            auto arg_list = std::dynamic_pointer_cast<ast::CallList>(m_args);
+            if (arg_list == nullptr) {
+                return set_error("Invalid CallList in Call");
+            }
+            for (const auto &arg : arg_list->get_args()) {
+                if (auto ret = arg->compute_stmt_type(st)) {
+                    return ret;
+                }
+            }
+        }
 
-    //     if (! func_entry) {
-    //         return set_error(fmt::format("Identifier '{}' is not found", callee->get_value()));
-    //     }
-
-    //     return nullptr;
-    // }
+        return nullptr;
+    }
 
     std::string get_type(SymbolTable &st) const override {
 
