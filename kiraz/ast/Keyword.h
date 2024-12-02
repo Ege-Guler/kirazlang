@@ -6,6 +6,7 @@
 #include <iostream>
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
+#include <kiraz/ast/Literal.h>
 #include <kiraz/ast/Misc.h>
 #include <set>
 #include <vector>
@@ -35,7 +36,7 @@ public:
 
         set_cur_symtab(st.get_cur_symtab());
 
-        if (auto ret = m_identifier->add_to_symtab_forward(st)) {
+        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
         if (m_initial_val) {
@@ -356,7 +357,9 @@ public:
 
     SymTabEntry get_subsymbol(Ptr &p) const override {
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(p);
-        return m_symtab->get_symbol(iden->get_value());
+        auto sym = m_symtab->get_symbol(iden->get_value());
+
+        return sym.stmt;
     }
 
     bool is_class() const override { return true; }
@@ -408,7 +411,6 @@ public:
         }
 
         SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Class, shared_from_this());
-
         if (get_stmt_list()) {
 
             auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
@@ -422,12 +424,20 @@ public:
                         if (auto ret = node->add_to_symtab_forward(st)) {
                             return ret;
                         }
-                        if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
-                            return ret;
-                        }
                     }
 
                     if (auto ret = node->compute_stmt_type(st)) {
+                        return ret;
+                    }
+                }
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+                    if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
+                        return ret;
+                    }
+                    if (auto ret = node->compute_stmt_type(*m_symtab)) {
                         return ret;
                     }
                 }

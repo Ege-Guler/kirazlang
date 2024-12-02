@@ -6,7 +6,7 @@
 #include <iostream>
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
-#include <kiraz/ast/Literal.h>
+#include <kiraz/ast/Keyword.h>
 
 namespace ast {
 class OpBinary : public Node {
@@ -75,7 +75,7 @@ private:
 class OpAdd : public OpBinary {
 public:
     OpAdd(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_PLUS, left, right) {}
-    
+
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
 
@@ -95,7 +95,7 @@ public:
 
         auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
         auto l_node = st.get_symbol(l_iden->get_value());
-        
+
         auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
         auto r_node = st.get_symbol(r_iden->get_value());
 
@@ -214,16 +214,19 @@ public:
 
         auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
         auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
-        auto l_node = st.get_symbol(l_iden->get_value());
 
-        if ((l_node.stmt)->get_subsymbol(r)) {
-            return nullptr;
+        if (std::islower(l_iden->get_value()[0])) {
+            auto let_node = st.get_symbol(l_iden->get_value());
+            auto type = let_node.stmt->get_type(st); // string type name
+            auto class_node = st.get_symbol(type);
+            if ((class_node.stmt)->get_subsymbol(r)) {
+                return nullptr;
+            }
+            else {
+                return set_error(fmt::format("Identifier '{}.{}' is not found", l_iden->get_value(),
+                        r_iden->get_value()));
+            }
         }
-        else {
-            return set_error(fmt::format(
-                    "Identifier '{}.{}' is not found", l_iden->get_value(), r_iden->get_value()));
-        }
-
         return nullptr;
     }
 };
