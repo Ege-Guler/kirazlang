@@ -1,0 +1,13 @@
+84:ParserFixture.bonus
+85:CompilerFixture.class_subsymbol
+89:CompilerFixture.class_parent_subsymbol
+90:CompilerFixture.class_parent_subclass_assignment
+91:CompilerFixture.class_parent_subsymbol_no_redef
+123:CompilerFixture.func_no_builtin_assignment_and
+124:CompilerFixture.func_no_builtin_assignment_or
+125:CompilerFixture.func_no_builtin_assignment_not
+126:CompilerFixture.func_hello_world
+151:CompilerFixture.func_use_before_definition
+157:CompilerFixture.import_subsymbol_missing
+158:CompilerFixture.func_call_argnum_mismatch
+159:CompilerFixture.func_call_type_mismatch
