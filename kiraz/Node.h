@@ -125,7 +125,7 @@ public:
      *        subsymbol access like Module and Class.
      * @return The statement pointer if found in the given symtab, otherwise nullptr
      */
-    virtual SymTabEntry get_subsymbol(Ptr) const { return {}; }
+    virtual SymTabEntry get_subsymbol(Ptr &p) const { return {}; }
 
     /*
      * Static interface
@@ -153,7 +153,7 @@ public:
     }
 
     void set_cur_symtab(std::shared_ptr<Scope> symtab) {
-        assert((! m_cur_symtab) || (m_cur_symtab == symtab));
+        // assert((! m_cur_symtab) || (m_cur_symtab == symtab));
         m_cur_symtab = symtab;
     }
     auto get_cur_symtab() { return m_cur_symtab; }

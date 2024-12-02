@@ -6,6 +6,7 @@
 #include <iostream>
 #include <kiraz/Compiler.h>
 #include <kiraz/Node.h>
+#include <kiraz/ast/Literal.h>
 #include <kiraz/ast/Misc.h>
 #include <set>
 #include <vector>
@@ -34,7 +35,7 @@ public:
     Ptr compute_stmt_type(SymbolTable &st) override {
 
         set_cur_symtab(st.get_cur_symtab());
-        
+
         if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
@@ -53,10 +54,11 @@ public:
         }
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_identifier);
-        
+
         if (iden && std::isupper(iden->get_value()[0])) {
             return set_error(
-                fmt::format("Variable name '{}' can not start with an uppercase letter", iden->get_value()));
+                    fmt::format("Variable name '{}' can not start with an uppercase letter",
+                            iden->get_value()));
         }
         if (m_type) {
 
@@ -363,6 +365,13 @@ public:
         }
     }
 
+    SymTabEntry get_subsymbol(Ptr &p) const override {
+        auto iden = std::dynamic_pointer_cast<ast::Identifier>(p);
+        auto sym = m_symtab->get_symbol(iden->get_value());
+
+        return sym.stmt;
+    }
+
     bool is_class() const override { return true; }
 
     Ptr add_to_symtab_forward(SymbolTable &st) override {
@@ -381,6 +390,10 @@ public:
     Ptr compute_stmt_type(SymbolTable &st) override {
         if (auto ret = Node::compute_stmt_type(st)) {
             return ret;
+        }
+
+        if (! m_symtab) {
+            m_symtab = std::make_unique<SymbolTable>(ScopeType::Class);
         }
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
@@ -408,7 +421,6 @@ public:
         }
 
         SymbolTable::ScopeRef scope_ref = st.enter_scope(ScopeType::Class, shared_from_this());
-
         if (get_stmt_list()) {
 
             auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
@@ -425,6 +437,17 @@ public:
                     }
 
                     if (auto ret = node->compute_stmt_type(st)) {
+                        return ret;
+                    }
+                }
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+                    if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
+                        return ret;
+                    }
+                    if (auto ret = node->compute_stmt_type(*m_symtab)) {
                         return ret;
                     }
                 }
@@ -470,29 +493,30 @@ public:
     }
 
     Ptr compute_stmt_type(SymbolTable &st) override {
-            set_cur_symtab(st.get_cur_symtab());
+        set_cur_symtab(st.get_cur_symtab());
 
-            if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
-                return set_error("Misplaced while statement");
-            }
-
-            if (m_condition) {
-                auto condition_type = m_condition->get_type(st);
-                if (condition_type != "Boolean") {
-                    return set_error("While only accepts tests of type 'Boolean'");
-                }
-            } else {
-                return set_error("Condition is missing in while statement");
-            }
-
-            if (m_stmt_list) {
-                if (auto ret = m_stmt_list->compute_stmt_type(st)) {
-                    return ret;
-                }
-            }
-
-            return nullptr;
+        if (st.get_scope_type() == ScopeType::Module || st.get_scope_type() == ScopeType::Class) {
+            return set_error("Misplaced while statement");
         }
+
+        if (m_condition) {
+            auto condition_type = m_condition->get_type(st);
+            if (condition_type != "Boolean") {
+                return set_error("While only accepts tests of type 'Boolean'");
+            }
+        }
+        else {
+            return set_error("Condition is missing in while statement");
+        }
+
+        if (m_stmt_list) {
+            if (auto ret = m_stmt_list->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        return nullptr;
+    }
 
     Node::Ptr get_condition() const { return m_condition; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
