@@ -199,6 +199,32 @@ public:
 class OpDot : public OpBinary {
 public:
     OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
+    
+    Ptr compute_stmt_type(SymbolTable &st) override {
+            set_cur_symtab(st.get_cur_symtab());
+
+            auto l = get_left();
+
+            if (l) {
+                if (auto ret = l->compute_stmt_type(st)) {
+                    return ret;
+                }
+            }
+            
+            // Check if left exists in the symbol table
+            auto left_id = std::dynamic_pointer_cast<ast::Identifier>(l);
+            if (!left_id) {
+                return set_error("Left operand of '.' is not a valid identifier");
+            }
+
+            auto left_entry = st.get_symbol(left_id->get_value());
+            if (!left_entry.stmt) {
+                return set_error(
+                    fmt::format("Identifier '{}' is not found in symbol table", left_id->get_value()));
+            }
+
+            return nullptr;
+        }
 };
 
 class OpAnd : public OpBinary {
