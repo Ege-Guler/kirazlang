@@ -149,6 +149,23 @@ public:
         auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
         auto l_node = st.get_symbol(l_iden->get_value());
 
+        if ( l_iden->get_value() == "and"
+            || l_iden->get_value() == "or"
+            || l_iden->get_value() == "not"
+            || l_iden->get_value() =="Integer64"
+            || l_iden->get_value() == "func"
+            || l_iden->get_value() == "String"
+            || l_iden->get_value() == "void"
+            || l_iden->get_value() == "Void"
+            || l_iden->get_value() == "class"
+            )
+        
+        {
+            return set_error(fmt::format(
+                    "Overriding builtin '{}' is not allowed",
+                                         l_iden->get_value()));
+        }
+        
         if (l_node) {
             if (r->get_type(st) != (l_node.stmt)->get_type(st)) {
                 return set_error(fmt::format(
@@ -199,7 +216,6 @@ public:
 class OpDot : public OpBinary {
 public:
     OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
-
     Ptr compute_stmt_type(SymbolTable &st) override {
         set_cur_symtab(st.get_cur_symtab());
 
