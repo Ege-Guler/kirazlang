@@ -75,6 +75,39 @@ private:
 class OpAdd : public OpBinary {
 public:
     OpAdd(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_PLUS, left, right) {}
+    
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        set_cur_symtab(st.get_cur_symtab());
+
+        auto r = get_right();
+        auto l = get_left();
+
+        if (r) {
+            if (auto ret = r->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+        if (l) {
+            if (auto ret = l->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
+        auto l_node = st.get_symbol(l_iden->get_value());
+        
+        auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
+        auto r_node = st.get_symbol(r_iden->get_value());
+
+        if (l_node) {
+            if ((r_node.stmt)->get_type(st) != (l_node.stmt)->get_type(st)) {
+                return set_error(fmt::format("Operator '+' not defined for types '{}' and '{}'",
+                        (l_node.stmt)->get_type(st), (r_node.stmt)->get_type(st)));
+            }
+        }
+
+        return nullptr;
+    }
 };
 
 class OpSub : public OpBinary {
