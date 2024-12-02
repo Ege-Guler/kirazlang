@@ -125,7 +125,7 @@ public:
      *        subsymbol access like Module and Class.
      * @return The statement pointer if found in the given symtab, otherwise nullptr
      */
-    virtual SymTabEntry get_subsymbol(Ptr) const { return {}; }
+    virtual SymTabEntry get_subsymbol(Ptr &p) const { return {}; }
 
     /*
      * Static interface

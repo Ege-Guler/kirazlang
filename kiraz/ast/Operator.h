@@ -166,6 +166,33 @@ public:
 class OpDot : public OpBinary {
 public:
     OpDot(const Node::Ptr &left, const Node::Ptr &right) : OpBinary(OP_DOT, left, right) {}
+
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        set_cur_symtab(st.get_cur_symtab());
+
+        auto l = get_left();
+        auto r = get_right();
+
+        if (l) {
+            if (auto ret = l->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
+        auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
+        auto l_node = st.get_symbol(l_iden->get_value());
+
+        if ((l_node.stmt)->get_subsymbol(r)) {
+            return nullptr;
+        }
+        else {
+            return set_error(fmt::format(
+                    "Identifier '{}.{}' is not found", l_iden->get_value(), r_iden->get_value()));
+        }
+
+        return nullptr;
+    }
 };
 
 class OpAnd : public OpBinary {
