@@ -35,7 +35,7 @@ public:
 
         set_cur_symtab(st.get_cur_symtab());
         
-        if (auto ret = m_identifier->add_to_symtab_forward(st)) {
+        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
         if (m_initial_val) {
@@ -257,6 +257,16 @@ public:
 
     std::string as_string() const override {
         return fmt::format("Import({})", m_identifier->as_string());
+    }
+    
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        
+        set_cur_symtab(st.get_cur_symtab());
+        
+        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+            return ret;
+        }
+        return nullptr;
     }
 
     Node::Ptr get_identifier() const { return m_identifier; }
