@@ -6,11 +6,10 @@
 
 namespace ast {
 
-Bool::Bool(Token::Ptr t) : Node(L_BOOLEAN){
+Bool::Bool(Token::Ptr t) : Node(L_BOOLEAN) {
     assert(t->get_id() == L_BOOLEAN);
     auto token_int = std::static_pointer_cast<const token::Bool>(t);
     m_value = token_int->get_value();
-
 }
 
 Integer::Integer(Token::Ptr t) : Node(L_INTEGER) {
@@ -28,14 +27,16 @@ Integer::Integer(Token::Ptr t) : Node(L_INTEGER) {
 }
 
 Identifier::Identifier(Token::Ptr t) : Node(IDENTIFIER) {
-    assert(t->get_id() == IDENTIFIER); 
-    auto token_identifier = std::static_pointer_cast<const token::Identifier>(t); 
-    m_value = token_identifier->get_value(); 
+    assert(t->get_id() == IDENTIFIER);
+    auto token_identifier = std::static_pointer_cast<const token::Identifier>(t);
+    m_value = token_identifier->get_value();
 }
 
-String::String(Token::Ptr t): Node(L_STRING) {
+Identifier::Identifier(std::string value) : Node(IDENTIFIER), m_value(value) {}
+
+String::String(Token::Ptr t) : Node(L_STRING) {
     assert(t->get_id() == L_STRING);
-    auto token_identifier = std::static_pointer_cast<const token::String>(t); 
+    auto token_identifier = std::static_pointer_cast<const token::String>(t);
     m_value = token_identifier->get_value();
 }
 

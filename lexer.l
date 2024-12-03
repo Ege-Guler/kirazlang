@@ -8,6 +8,7 @@
 #include <kiraz/token/Literal.h>
 #include <kiraz/token/Operator.h>
 #include <kiraz/token/Keyword.h>
+
 static auto &colno = Token::colno;
 using namespace token;
 extern std::shared_ptr<Token> curtoken;
@@ -18,6 +19,11 @@ extern std::shared_ptr<Token> curtoken;
 
 "true"  { colno += yyleng; curtoken = Token::New<Bool>(true); return L_BOOLEAN; }
 "false" { colno += yyleng; curtoken = Token::New<Bool>(false); return L_BOOLEAN; }
+
+"and"   { colno += yyleng; curtoken = Token::New<OpAnd>(); return OP_AND; }
+"or"    { colno += yyleng; curtoken = Token::New<OpOr>(); return OP_OR; }
+"not"   { colno += yyleng; curtoken = Token::New<OpNot>(); return OP_NOT; }
+
 
 
 
