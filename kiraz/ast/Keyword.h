@@ -61,8 +61,15 @@ public:
                             iden->get_value()));
         }
         if (m_type) {
+            auto type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+            auto type_node = st.get_symbol(type->get_value());
 
-            iden->set_type(m_type);
+            if ((type_node.stmt)->is_class()) {
+                iden->set_type((type_node.stmt)->get_base_name());
+            }
+            else {
+                iden->set_type(m_type);
+            }
         }
         else if (! m_type) {
             iden->set_type(m_initial_val->get_type(st));
@@ -71,22 +78,28 @@ public:
         auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
 
         if (m_type && m_initial_val) {
-            if (let_type->get_value() != m_initial_val->get_type(st)) {
-                return set_error(
-                        fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
-                                m_initial_val->get_type(st), let_type->get_value()));
+            auto init_iden = std::dynamic_pointer_cast<ast::Identifier>(m_initial_val);
+
+            if (init_iden) {
+                auto init_node = st.get_symbol(init_iden->get_value());
+
+                if (let_type->get_value() != (init_node.stmt)->get_type(st)) {
+                    return set_error(
+                            fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
+                                    (init_node.stmt)->get_type(st), let_type->get_value()));
+                }
+            }
+            else {
+
+                if (let_type->get_value() != m_initial_val->get_type(st)) {
+                    return set_error(
+                            fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
+                                    m_initial_val->get_type(st), let_type->get_value()));
+                }
             }
         }
         return nullptr;
     }
-
-    // std::string get_type(SymbolTable &st) const override {
-    //     if (m_type) {
-    //         auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
-    //         return type_name->get_value();
-    //     }
-    //     return m_initial_val->get_type(st);
-    // }
 
     Node::Ptr get_identifier() const { return m_identifier; }
     Node::Ptr get_initial_val() const { return m_initial_val; }
@@ -234,6 +247,16 @@ public:
                     }
                 }
             }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+                    if (! node->is_identifier()) {
+                        if (auto ret = node->add_to_symtab_ordered(st)) {
+                            return ret;
+                        }
+                    }
+                }
+            }
         }
 
         return nullptr;
@@ -260,11 +283,11 @@ public:
     std::string as_string() const override {
         return fmt::format("Import({})", m_identifier->as_string());
     }
-    
+
     Ptr compute_stmt_type(SymbolTable &st) override {
-        
+
         set_cur_symtab(st.get_cur_symtab());
-        
+
         if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
@@ -374,6 +397,16 @@ public:
 
     bool is_class() const override { return true; }
 
+    std::string get_base_name() const override {
+        if (m_base_name) {
+            auto base_iden = std::dynamic_pointer_cast<ast::Identifier>(m_base_name);
+            return base_iden->get_value();
+        }
+        auto name_iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+        return name_iden->get_value();
+        return "";
+    }
+
     Ptr add_to_symtab_forward(SymbolTable &st) override {
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
@@ -457,22 +490,8 @@ public:
         return nullptr;
     }
 
-    // !TODO
-    // SymTabEntry get_subsymbol(const std::string &name) const override {
-    //     if (auto ret = Node::get_subsymbol(name)) {
-    //         return ret;
-    //     }
-
-    //     if (m_symtab) {
-    //         return m_symtab->get_symbol(name);
-    //     }
-
-    //     return {};
-    // }
-
     Node::Ptr get_name() const { return m_name; }
     Node::Ptr get_stmt_list() const { return m_stmt_list; }
-    Node::Ptr get_base_name() const { return m_base_name; }
 
 private:
     Node::Ptr m_name;

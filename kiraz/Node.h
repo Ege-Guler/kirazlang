@@ -50,6 +50,7 @@ public:
         return s_roots.back();
     }
 
+    virtual std::string get_base_name() const { return ""; }
     virtual std::string get_type(SymbolTable &st) const { return "Node"; }
     virtual bool is_identifier() const { return false; }
     virtual bool is_func() const { return false; }
