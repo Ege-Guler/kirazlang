@@ -480,9 +480,6 @@ public:
                     if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
                         return ret;
                     }
-                    if (auto ret = node->compute_stmt_type(*m_symtab)) {
-                        return ret;
-                    }
                 }
             }
         }
