@@ -32,13 +32,18 @@ public:
                 m_initial_val->as_string());
     }
 
-    Ptr compute_stmt_type(SymbolTable &st) override {
+    Ptr add_to_symtab_ordered(SymbolTable &st) override {
+        for (const auto &[name, entry] : st.get_cur_symtab()->symbols) {
+            fmt::print("name: '{}'\n", name);
+        }
+        fmt::print("2Adding class '{}' to symtab\n", ScopeType::Class == st.get_scope_type());
 
-        set_cur_symtab(st.get_cur_symtab());
+        auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_identifier);
 
-        if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
+        if (auto ret = iden->add_to_symtab_ordered(st)) {
             return ret;
         }
+
         if (m_initial_val) {
             if (auto ret = m_initial_val->compute_stmt_type(st)) {
                 return ret;
@@ -53,13 +58,28 @@ public:
             }
         }
 
-        auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_identifier);
-
         if (iden && std::isupper(iden->get_value()[0])) {
             return set_error(
                     fmt::format("Variable name '{}' can not start with an uppercase letter",
                             iden->get_value()));
         }
+        // if (m_type) {
+        //     auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+
+        //     auto type_node = st.get_symbol(type_name->get_value());
+
+        //     if (type_node) {
+
+        //         if (! type_node.stmt->is_class()) {
+        //             if (iden && std::isupper(iden->get_value()[0])) {
+        //                 return set_error(fmt::format(
+        //                         "Variable name '{}' can not start with an uppercase letter",
+        //                         iden->get_value()));
+        //             }
+        //         }
+        //     }
+        // }
+
         if (m_type) {
             auto type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
             auto type_node = st.get_symbol(type->get_value());
@@ -75,22 +95,40 @@ public:
             iden->set_type(m_initial_val->get_type(st));
         }
 
-        auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+        m_identifier->add_to_symtab_ordered(st);
+        return nullptr;
+    }
 
+    Ptr compute_stmt_type(SymbolTable &st) override {
+        set_cur_symtab(st.get_cur_symtab());
+
+        if (m_initial_val) {
+            if (auto ret = m_initial_val->compute_stmt_type(st)) {
+                return ret;
+            }
+        }
+
+        if (m_type) {
+            auto type_name = std::dynamic_pointer_cast<ast::Identifier>(m_type);
+            if (! type_name || ! st.get_symbol(type_name->get_value())) {
+                return set_error(
+                        fmt::format("Type '{}' not found for let statement", m_type->as_string()));
+            }
+        }
+
+        auto let_type = std::dynamic_pointer_cast<ast::Identifier>(m_type);
         if (m_type && m_initial_val) {
             auto init_iden = std::dynamic_pointer_cast<ast::Identifier>(m_initial_val);
 
             if (init_iden) {
                 auto init_node = st.get_symbol(init_iden->get_value());
-
-                if (let_type->get_value() != (init_node.stmt)->get_type(st)) {
+                if (let_type->get_value() != init_node.stmt->get_type(st)) {
                     return set_error(
                             fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
                                     (init_node.stmt)->get_type(st), let_type->get_value()));
                 }
             }
             else {
-
                 if (let_type->get_value() != m_initial_val->get_type(st)) {
                     return set_error(
                             fmt::format("Initializer type '{}' doesn't match explicit type '{}'",
@@ -98,6 +136,7 @@ public:
                 }
             }
         }
+
         return nullptr;
     }
 
@@ -237,13 +276,9 @@ public:
                 if (node) {
 
                     if (! node->is_identifier()) {
-                        if (auto ret = node->add_to_symtab_forward(st)) {
+                        if (auto ret = node->add_to_symtab_ordered(st)) {
                             return ret;
                         }
-                    }
-
-                    if (auto ret = node->compute_stmt_type(st)) {
-                        return ret;
                     }
                 }
             }
@@ -251,9 +286,17 @@ public:
             for (const auto &node : node_list->get_nodes()) {
                 if (node) {
                     if (! node->is_identifier()) {
-                        if (auto ret = node->add_to_symtab_ordered(st)) {
+                        if (auto ret = node->add_to_symtab_forward(st)) {
                             return ret;
                         }
+                    }
+                }
+            }
+
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+                    if (auto ret = node->compute_stmt_type(st)) {
+                        return ret;
                     }
                 }
             }
@@ -410,12 +453,17 @@ public:
     Ptr add_to_symtab_forward(SymbolTable &st) override {
 
         auto iden = std::dynamic_pointer_cast<ast::Identifier>(m_name);
+        fmt::print("Adding class '{}' to symtab\n", ScopeType::Module == st.get_scope_type());
         if (st.get_symbol(iden->get_value())) {
             return set_error(
                     fmt::format("Identifier '{}' is already in symtab", iden->get_value()));
         }
 
         st.add_symbol(iden->get_value(), shared_from_this());
+
+        for (const auto &[name, entry] : st.get_cur_symtab()->symbols) {
+            fmt::print("name: '{}'\n", name);
+        }
 
         return nullptr;
     }
@@ -467,17 +515,25 @@ public:
                         if (auto ret = node->add_to_symtab_forward(st)) {
                             return ret;
                         }
-                    }
-
-                    if (auto ret = node->compute_stmt_type(st)) {
-                        return ret;
+                        if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
+                            return ret;
+                        }
                     }
                 }
             }
 
             for (const auto &node : node_list->get_nodes()) {
                 if (node) {
-                    if (auto ret = node->add_to_symtab_forward(*m_symtab)) {
+                    if (! node->is_identifier()) {
+
+                        if (auto ret = node->add_to_symtab_ordered(*m_symtab)) {
+                            return ret;
+                        }
+                        if (auto ret = node->add_to_symtab_ordered(st)) {
+                            return ret;
+                        }
+                    }
+                    if (auto ret = node->compute_stmt_type(st)) {
                         return ret;
                     }
                 }
