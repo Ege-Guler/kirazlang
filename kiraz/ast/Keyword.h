@@ -260,7 +260,7 @@ public:
                                         "is already in symtab",
                                     arg_name->get_value(), func_name->get_value()));
                 }
-
+                fmt::print("added arg '{}'", arg_name->get_value());
                 st.add_symbol(arg_name->get_value(), identifier);
             }
         }
@@ -334,6 +334,30 @@ public:
         if (auto ret = m_identifier->add_to_symtab_ordered(st)) {
             return ret;
         }
+        
+        Node::Ptr node_io = st.get_module_io();
+        auto io_module = std::dynamic_pointer_cast<ast::Module>(node_io);
+        io_module->compute_stmt_type(st);
+        
+        auto m_stmt_list = io_module->get_m_stmt_list();
+        if (m_stmt_list) {
+
+            auto node_list = std::dynamic_pointer_cast<ast::NodeList>(m_stmt_list);
+            if (! node_list) {
+                return set_error("Invalid NodeList in Module");
+            }
+            for (const auto &node : node_list->get_nodes()) {
+                if (node) {
+
+                    if (auto ret = node->add_to_symtab_forward(st)) {
+                        return ret;
+                    }
+
+                }
+            }
+        }
+
+        
         return nullptr;
     }
 

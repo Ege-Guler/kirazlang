@@ -214,30 +214,57 @@ public:
         set_cur_symtab(st.get_cur_symtab());
 
         auto l = get_left();
-        auto r = get_right();
-
         if (l) {
             if (auto ret = l->compute_stmt_type(st)) {
                 return ret;
             }
         }
 
-        auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
         auto l_iden = std::dynamic_pointer_cast<ast::Identifier>(l);
-
-        if (std::islower(l_iden->get_value()[0])) {
-            auto let_node = st.get_symbol(l_iden->get_value());
-            auto type = let_node.stmt->get_type(st); // string type name
-            auto class_node = st.get_symbol(type);
-            if ((class_node.stmt)->get_subsymbol(r)) {
-                return nullptr;
-            }
-            else {
-                return set_error(fmt::format("Identifier '{}.{}' is not found", l_iden->get_value(),
-                        r_iden->get_value()));
-            }
+        if (!l_iden) {
+            return set_error("Left operand of '.' is not a valid identifier");
         }
-        return nullptr;
+        
+        if (l_iden->get_value() == "io")
+        {
+            auto left_entry = st.get_symbol(l_iden->get_value());
+            if (!left_entry.stmt) {
+                return set_error(
+                    fmt::format("Identifier '{}' is not found in symbol table", l_iden->get_value()));
+            }
+            
+            auto r = get_right();
+            auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
+            
+            auto right_entry = st.get_symbol(r_iden->get_value());
+            
+            if (!right_entry.stmt) {
+                return set_error(
+                    fmt::format("Identifier '{}.{}' is not found", l_iden->get_value(),
+                                r_iden->get_value()));
+            }
+            
+            return nullptr;
+            
+        }
+        
+        else{
+            auto r = get_right();
+            auto r_iden = std::dynamic_pointer_cast<ast::Identifier>(r);
+            if (std::islower(l_iden->get_value()[0])) {
+                auto let_node = st.get_symbol(l_iden->get_value());
+                auto type = let_node.stmt->get_type(st);
+                auto class_node = st.get_symbol(type);
+                if ((class_node.stmt)->get_subsymbol(r)) {
+                    return nullptr;
+                }
+                else {
+                    return set_error(fmt::format("Identifier '{}.{}' is not found", l_iden->get_value(),
+                                                 r_iden->get_value()));
+                }
+            }
+            return nullptr;
+        }
     }
 };
 

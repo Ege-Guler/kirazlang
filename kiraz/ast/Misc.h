@@ -94,6 +94,9 @@ public:
         return nullptr;
     }
 
+    //Node::Ptr get_m_symtab() const { return m_symtab; }
+    Node::Ptr get_m_stmt_list() const { return m_stmt_list; }
+    
 private:
     Node::Ptr m_stmt_list;
     std::unique_ptr<SymbolTable> m_symtab;
